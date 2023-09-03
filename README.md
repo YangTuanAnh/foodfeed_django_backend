@@ -24,11 +24,6 @@ pip install -r requirements.txt
 
 3. Run the application (make sure you have PostgreSQL running on your machine and please change the database settings in settings.py to your own database settings...)
 
-- If you have `bash/zsh/sh/...` shells, just replace with the `<shell>` that you have. For example, you have `bash`:
-    ```
-    bash setup.sh
-    ```
-- Else:
     ```
     python manage.py makemigrations
     python manage.py migrate 
