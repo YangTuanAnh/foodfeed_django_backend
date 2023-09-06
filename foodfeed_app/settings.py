@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     "users",
     "posts",
     "stores",
-    "foods"
+    # "food"
 ]
 
 MIDDLEWARE = [
