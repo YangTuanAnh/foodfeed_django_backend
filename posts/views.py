@@ -125,12 +125,6 @@ def post(request, post_id):
             messages.error(request, f"Did not found post {post_id}")
             return JsonResponse({"status": f"Did not found post {post_id}"}, status=404)
     
-def search(request):
-    if request.method=="GET":
-        query = request.GET.get('q', '')
-        
-    else: return HttpResponse("Search")
-    
 @login_required
 @csrf_exempt
 def reactions(request, post_id):

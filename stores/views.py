@@ -8,20 +8,21 @@ from django.views.decorators.csrf import csrf_exempt
 
 @csrf_exempt
 def search(request):
-    query = request.GET.get('query', '')  # Get the search query from the request
-    
-    # Perform a search on stores by name and address
-    results = Store.objects.filter(
-        Q(name__icontains=query) | Q(address__icontains=query)
-    )
+    if request.method=="GET":
+        query = request.GET.get('query', '')  # Get the search query from the request
+        
+        # Perform a search on stores by name and address
+        results = Store.objects.filter(
+            Q(name__icontains=query) | Q(address__icontains=query)
+        )
 
-    # Serialize the results to JSON
-    serialized_results = [
-        {'name': store.name, 'address': store.address, 'latitude': store.latitude, 'longitude': store.longitude}
-        for store in results
-    ]
+        # Serialize the results to JSON
+        serialized_results = [
+            {'name': store.name, 'address': store.address, 'latitude': store.latitude, 'longitude': store.longitude}
+            for store in results
+        ]
 
-    return JsonResponse({'results': serialized_results})
+        return JsonResponse({'results': serialized_results})
 
 # def test_connection(request):
 #     # Retrieve the first 10 stores from the database
