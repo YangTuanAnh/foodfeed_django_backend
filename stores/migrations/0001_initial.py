@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ("latitude", models.FloatField()),
                 ("longitude", models.FloatField()),
                 ("avg_rating", models.FloatField(default=0)),
-                ("imgage_link", models.CharField(max_length=255)),
+                ("image_link", models.CharField(max_length=255)),
             ],
         ),
     ]

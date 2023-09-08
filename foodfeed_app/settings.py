@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     "users",
     "posts",
     "stores",
-    # "food"
+    "food",
+    "feed"
 ]
 
 MIDDLEWARE = [

@@ -19,7 +19,7 @@ conda activate backend
 2. Install the dependencies.
 
 ```
-pip install -r requirements.txt
+conda install -r requirements.txt
 ```
 
 3. Run the application (make sure you have PostgreSQL running on your machine and please change the database settings in settings.py to your own database settings...)
