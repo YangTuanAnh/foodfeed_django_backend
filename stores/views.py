@@ -3,6 +3,7 @@ from .models import Store
 from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+import json
 
 # Create your views here.
 
@@ -31,19 +32,62 @@ def search(request):
     else:
         return HttpResponse("Search")
 
-# def test_connection(request):
-#     # Retrieve the first 10 stores from the database
-#     stores = Store.objects.all()[:10]
+@csrf_exempt
+def update(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        id = data.get('id', '')
+        if id == '':
+            return JsonResponse({'status': 'Missing id'}, status=400)
+        name = data.get('name', '')
+        address = data.get('address', '')
+        latitude = data.get('latitude', '')
+        longitude = data.get('longitude', '')
 
-#     # Serialize the store data to JSON
-#     serialized_stores = [
-#         {
-#             'name': store.name,
-#             'address': store.address,
-#             'latitude': store.latitude,
-#             'longitude': store.longitude,
-#         }
-#         for store in stores
-#     ]
+        store = Store.objects.get(id=id)
+        store.name = name
+        store.address = address
+        store.latitude = latitude
+        store.longitude = longitude
+        store.save()
 
-#     return JsonResponse({'stores': serialized_stores})
+        return JsonResponse({'status': f'Updated store {str(id)}'})
+    else:
+        return HttpResponse("Update")
+    
+@csrf_exempt
+def delete(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        id = data.get('id', '')
+        if id == '':
+            return JsonResponse({'status': 'Missing id'}, status=400)
+        store = Store.objects.get(id=id)
+        store.delete()
+        return JsonResponse({'status': f'Deleted store {str(id)}'})
+    else:
+        return HttpResponse("Delete")
+    
+@csrf_exempt
+def create(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        name = data.get('name', '')
+        address = data.get('address', '')
+        latitude = data.get('latitude', '')
+        longitude = data.get('longitude', '')
+        store = Store.objects.create(name=name, address=address, latitude=latitude, longitude=longitude)
+        return JsonResponse({'status': f'Created store {str(store.id)}'})
+    else:
+        return HttpResponse("Create")
+    
+@csrf_exempt
+def get(request):
+    if request.method == 'GET':
+        id = request.GET.get('id', '')
+        if id == '':
+            return JsonResponse({'status': 'Missing id'}, status=400)
+        store = Store.objects.get(id=id)
+        return JsonResponse({'name': store.name, 'address': store.address, 'latitude': store.latitude, 'longitude': store.longitude})
+    else:
+        return HttpResponse("Get")
