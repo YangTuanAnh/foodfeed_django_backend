@@ -22,11 +22,25 @@ conda create -n backend
 conda activate backend
 ```
 
-2. Install the dependencies.
+2. Install the dependencies (The hardest one)
 
 ```
 conda install -r requirements.txt
 ```
+
+- if the installation fails, run the below code to check missing modules.
+
+  ```
+  python manage.py runserver
+  ```
+
+  Some modules may occur for installation.
+
+  ```
+  pip install supabase
+  pip install psycopg2
+  pip install django-cors-headers
+  ```
 
 3. Run the application (make sure you have PostgreSQL running on your machine and please change the database settings in settings.py to your own database settings...)
 
