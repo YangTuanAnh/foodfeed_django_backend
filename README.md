@@ -1,8 +1,14 @@
 ### Instruction
 
-0. Put the private files into Backend/ folder (.env and .json files)
+0. Put the private files into folder foodfeed_app (.env and .json files)
 
-1. Create a new virtual environment with Python and activate it.
+1. Update the conda
+
+```
+conda update --all
+```
+
+3. Create a new virtual environment with Python and activate it.
 
 ```
 cd Backend/
