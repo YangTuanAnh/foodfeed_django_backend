@@ -37,9 +37,7 @@ conda install -r requirements.txt
   Some modules may occur for installation.
 
   ```
-  pip install supabase
-  pip install psycopg2
-  pip install django-cors-headers
+  pip install python-dotenv supabase psycopg2-binary django-cors-headers
   ```
 
 3. Run the application (make sure you have PostgreSQL running on your machine and please change the database settings in settings.py to your own database settings...)
