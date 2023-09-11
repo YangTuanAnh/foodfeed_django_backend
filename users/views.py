@@ -5,7 +5,7 @@ from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages, auth
 from .models import CustomUser as User
-from .models import Profile
+from .models import Profile, EmailBackend
 import json
 
 # Create your views here.
@@ -64,10 +64,10 @@ def register(request):
 def login(request):
     if request.method == "POST":
         data = json.loads(request.body)
-        username = data.get('username')
+        email = data.get('email')
         password = data.get('password')
         
-        user = auth.authenticate(username=username, password=password)
+        user = EmailBackend.authenticate(username=email, password=password)
         
         if user is not None:
             auth.login(request, user)

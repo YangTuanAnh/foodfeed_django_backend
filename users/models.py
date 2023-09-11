@@ -2,6 +2,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.timezone import datetime
+from django.contrib.auth.backends import ModelBackend
 
 class Profile(models.Model):
     id = models.AutoField(primary_key=True, unique=True)
@@ -17,3 +18,14 @@ class Profile(models.Model):
 class CustomUser(AbstractUser):
     phone_number = models.CharField(max_length=20)
     profile = models.ForeignKey(Profile, to_field="id", on_delete=models.CASCADE, default=datetime.now().timestamp())
+    
+class EmailBackend(ModelBackend):
+    def authenticate(self, request, username=None, password=None, **kwargs):
+        try:
+            user = CustomUser.objects.get(email=username)
+        except CustomUser.DoesNotExist:
+            return None
+        else:
+            if user.check_password(password):
+                return user
+        return None
