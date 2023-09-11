@@ -5,7 +5,8 @@ from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages, auth
 from .models import CustomUser as User
-from .models import Profile, EmailBackend
+from .models import Profile
+from .backends import EmailBackend
 import json
 
 # Create your views here.
