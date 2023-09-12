@@ -21,12 +21,15 @@ def register(request):
         phone_number = data.get('phone_number')
         password = data.get('password')
         password2 = data.get('password2')
+
+        print(full_name, username, email, phone_number, password, password2)
         
         # Check if passwords match
         if password == password2:
         # Check username
             if User.objects.filter(username=username).exists():
                 messages.error(request, 'That username is taken')
+            
                 return JsonResponse(
                     {"status": 'That username is taken'},
                     status=302
@@ -59,6 +62,7 @@ def register(request):
                 status=400
             )
     else:
+        print("Register")
         return HttpResponse("Register")
     
 @csrf_exempt
@@ -67,10 +71,15 @@ def login(request):
         data = json.loads(request.body)
         email = data.get('email')
         password = data.get('password')
+
+        emailBackend = EmailBackend()
         
-        user = EmailBackend.authenticate(username=email, password=password)
-        
+        user = emailBackend.authenticate(request=request, username=email, password=password)
+
         if user is not None:
+            #debug here
+            print("user is not none")
+
             auth.login(request, user)
             messages.success(request, 'You are now logged in')
             return JsonResponse(
@@ -78,7 +87,9 @@ def login(request):
                 status=200
             )
         else:
+            print("user is none")
             messages.error(request, 'Invalid credentials')
+
             return JsonResponse(
                 {"status": "Invalid credentials"},
                 status=403
