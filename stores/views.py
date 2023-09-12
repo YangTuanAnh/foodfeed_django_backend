@@ -28,66 +28,67 @@ def search(request):
             for store in results
         ]
 
-        return JsonResponse({'results': serialized_results})
+        return JsonResponse(
+            {'status': "success", 'results': serialized_results, 'count': len(results)},
+            status=200
+        )
     else:
         return HttpResponse("Search")
 
 @csrf_exempt
-def update(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        id = data.get('id', '')
-        if id == '':
-            return JsonResponse({'status': 'Missing id'}, status=400)
-        name = data.get('name', '')
-        address = data.get('address', '')
-        latitude = data.get('latitude', '')
-        longitude = data.get('longitude', '')
-
-        store = Store.objects.get(id=id)
-        store.name = name
-        store.address = address
-        store.latitude = latitude
-        store.longitude = longitude
-        store.save()
-
-        return JsonResponse({'status': f'Updated store {str(id)}'})
-    else:
-        return HttpResponse("Update")
+def stores(request, store_id):
+    if request.method == "GET":
+        store = Store.objects.get(store_id)
+        if store is None:
+            return JsonResponse({"status": f"Did not found store {store_id}"}, status=404)
+        else:
+            return JsonResponse({"status": "success", 'results': store}, status=200)
     
-@csrf_exempt
-def delete(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        id = data.get('id', '')
-        if id == '':
-            return JsonResponse({'status': 'Missing id'}, status=400)
-        store = Store.objects.get(id=id)
-        store.delete()
-        return JsonResponse({'status': f'Deleted store {str(id)}'})
-    else:
-        return HttpResponse("Delete")
-    
-@csrf_exempt
-def create(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        name = data.get('name', '')
-        address = data.get('address', '')
-        latitude = data.get('latitude', '')
-        longitude = data.get('longitude', '')
+    elif request.method == "POST":
+        name = request.POST.get('name', '')
+        address = request.POST.get('address', '')
+        latitude = request.POST.get('latitude', '')
+        longitude = request.POST.get('longitude', '')
+        
+        # check if any of the fields are empty
+        if name == '' or address == '' or latitude == '' or longitude == '':
+            return JsonResponse({"status": "Missing fields"}, status=400)
+        
+        # check if the store already exists
+        store = Store.objects.filter(name=name, address=address, latitude=latitude, longitude=longitude)
+        if store is not None:
+            return JsonResponse({"status": "Store already exists"}, status=400)
+        
+        # create the store
         store = Store.objects.create(name=name, address=address, latitude=latitude, longitude=longitude)
-        return JsonResponse({'status': f'Created store {str(store.id)}'})
-    else:
-        return HttpResponse("Create")
+        return JsonResponse({"status": "Created store " + str(store.id)}, status=200)
     
-@csrf_exempt
-def get(request):
-    if request.method == 'GET':
-        id = request.GET.get('id', '')
-        if id == '':
-            return JsonResponse({'status': 'Missing id'}, status=400)
-        store = Store.objects.get(id=id)
-        return JsonResponse({'name': store.name, 'address': store.address, 'latitude': store.latitude, 'longitude': store.longitude})
+    elif request.method == "PUT":
+        name = request.POST.get('name', '')
+        address = request.POST.get('address', '')
+        latitude = request.POST.get('latitude', '')
+        longitude = request.POST.get('longitude', '')
+        
+        # check if any of the fields are empty
+        if name == '' or address == '' or latitude == '' or longitude == '':
+            return JsonResponse({"status": "Missing fields"}, status=400)
+        
+        # check if the store not exists
+        store = Store.objects.filter(name=name, address=address, latitude=latitude, longitude=longitude)
+        if store is None:
+            return JsonResponse({"status": "Store does not exist"}, status=400)
+        
+        # update the store
+        store = Store.objects.filter(name=name, address=address, latitude=latitude, longitude=longitude).update(name=name, address=address, latitude=latitude, longitude=longitude)
+        return JsonResponse({"status": "Updated store " + str(store.id)}, status=200)
+    
+    elif request.method == "DELETE":
+        store = Store.objects.get(store_id)
+        if store is None:
+            return JsonResponse({"status": f"Did not found store {store_id}"}, status=404)
+        else:
+            store.delete()
+            return JsonResponse({"status": "Deleted store " + str(store.id)}, status=200)
+        
     else:
-        return HttpResponse("Get")
+        return HttpResponse("Stores")
