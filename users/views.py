@@ -8,6 +8,7 @@ from .models import CustomUser as User
 from .models import Profile
 from .backends import EmailBackend
 import json
+from posts.views import uploadOntoS3
 
 # Create your views here.
 @csrf_exempt
@@ -101,7 +102,7 @@ def login(request):
 def logout(request):
     if request.method=="POST":
         auth.logout(request)
-        messages.error(request, "You are now logged out")
+        messages.success(request, "You are now logged out")
         return JsonResponse(
             {"status": "You are now logged out"},
             status=200
@@ -114,7 +115,8 @@ def profile(request):
     if request.method=="PUT":
         data = json.loads(request.body)
         profile = request.user.profile
-        profile.full_name, profile.bio, profile.avatar = data.get('full_name'), data.get('bio'), data.get('avatar')
+        profile.full_name, profile.bio, profile.avatar_base64, profile.avatar_filename = data.get('full_name'), data.get('bio'), data.get('avatar_base64'), data.get('avatar_filename')
+        profile.avatar = uploadOntoS3(image_base64=profile.avatar_base64, image_name=profile.avatar_filename)
         profile.save()
         return JsonResponse({"status": "Updated profile"}, status=200)
     elif request.method=="GET":

@@ -56,6 +56,22 @@ def remove_special_characters_and_replace_spaces(input_string):
 
     return cleaned_string
 
+def uploadOntoS3(image_base64, image_name):
+    image_name = remove_special_characters_and_replace_spaces(image_name)
+    image_binary = base64.b64decode(image_base64)
+    file_obj = io.BytesIO(image_binary)
+    file_obj.seek(0)
+    file = io.BufferedReader(file_obj)
+
+    fileName = os.path.join(image_folder, image_name)
+    save_uploaded_file(file, fileName, image_folder)
+    
+    upload=supabase.storage.from_(BUCKET_NAME).upload(image_name, file, {"content-type": "image/png"})
+    
+    os.remove(fileName)
+    
+    return f'{STORAGE_URL}/storage/v1/object/public/{BUCKET_NAME}/{image_name}'
+    
 # Create your views here.
 @csrf_exempt
 def posts(request):
@@ -77,23 +93,9 @@ def posts(request):
         rating = data.get("rating")
         
         image_base64 = data.get("image_base64")
-        image_name = data.get("image_name")
+        image_name = data.get("image_name")      
         
-        image_name = remove_special_characters_and_replace_spaces(image_name)
-        
-        image_binary = base64.b64decode(image_base64)
-        file_obj = io.BytesIO(image_binary)
-        file_obj.seek(0)
-        file = io.BufferedReader(file_obj)
-
-        fileName = os.path.join(image_folder, image_name)
-        save_uploaded_file(file, fileName, image_folder)
-        
-
-        upload=supabase.storage.from_(BUCKET_NAME).upload(image_name, file, {"content-type": "image/png"})
-    
-        image_link = f'{STORAGE_URL}/storage/v1/object/public/{BUCKET_NAME}/{image_name}'
-        os.remove(fileName)
+        image_link = uploadOntoS3(image_base64, image_name)        
         
         post = Post.objects.create(user=user, body=body, rating=rating, image_link=image_link)
         
