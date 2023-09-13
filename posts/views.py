@@ -85,10 +85,11 @@ def posts(request):
         data = json.loads(request.body)
                 
         user = request.user
+        title = re.sub(r'<.*?>', '', data.get("title"))
         body = re.sub(r'<.*?>', '', data.get("body"))
-        if len(body)==0:
-            messages.error(request, "Missing body or image link")
-            return JsonResponse({"status": "Missing body or image link"}, status=302)
+        if len(body)==0 or len(title)==0:
+            messages.error(request, "Missing body or title")
+            return JsonResponse({"status": "Missing body or title"}, status=302)
         
         rating = data.get("rating")
         
@@ -120,7 +121,7 @@ def post(request, post_id):
             return JsonResponse({"status": f"Did not found post {post_id}"}, status=404)
     if request.method=="DELETE":
         try:
-            post = Post.objects.delete(id=post_id)
+            post = Post.objects.delete(id=post_id, user=request.user)
             messages.success(request, f"Deleted post {post_id}")
             return JsonResponse({"status": f"Deleted post {post_id}"}, status=200)
         except Post.DoesNotExist:
@@ -136,7 +137,7 @@ def reactions(request, post_id):
         if request.method=="GET":
             reactions = Reaction.objects.filter(post=post)
             users = [row.user.id for row in reactions]
-            return JsonResponse({"Reaction count": len(users), "Users": users}, safe=False, status=200)
+            return JsonResponse({"count": len(users), "Users": users}, safe=False, status=200)
             
         elif request.method=='POST':
             existing_reaction = Reaction.objects.filter(user=request.user, post=post).first()

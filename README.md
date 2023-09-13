@@ -67,7 +67,7 @@ conda install -r requirements.txt
 ## Documentation
 
 ![Database Design](dbdesign.png)
-### users
+### /users
 #### `/login`
 Login to existing user in the database.
 ##### POST
@@ -148,10 +148,88 @@ Returns the profile of a specified user id.
   avatar: "[s3 link of image]"
 }
 ```
-### posts
+### /posts
+#### `/`
+Returns current user's posts or submit new post.
+##### GET
+Returns
+```
+[{
+  id: 1,
+  user: "yangtuananh2003",
+  title: "Review cantin Sư Phạm",
+  body: "ngon nhưng đông vl",
+  rating: 5,
+  image_link: "[s3 link]",
+  create_at: "[timedate]"
+}, ...
+]
+```
+##### POST
+```
+{
+  title: "Review cantin KHTN",
+  body: "ngon qua", 
+  rating: 5, 
+  image_base64: "[base64 image]", 
+  image_name: "khtn.png"
+}
+```
+returns
+```
+{
+  status: "Created post 3743289"
+}
+```
+#### `/<int:post_id>`
+Returns post
+##### GET
+Returns
+```
+{
+  id: 1,
+  user: "yangtuananh2003",
+  title: "Review cantin Sư Phạm",
+  body: "ngon nhưng đông vl",
+  rating: 5,
+  image_link: "[s3 link]",
+  create_at: "[timedate]"
+}
+```
+Login required, only deletes posts that you made.
 
+##### DELETE
+```
+{
+  status: "Deleted post 23493915"
+}
+```
+
+#### `/reactions/<int:post_id>`
+Returns reactions for a post
+##### POST
+No input, returns
+```
+{
+  status: "yangtuananh2003 reacted to 12375839"
+}
+```
+if gave reaction, else if reacted
+```
+{
+  status: "Deleted reaction from 12375839"
+}
+```
+##### GET
+```
+{
+  count: 100
+}
+```
 ### stores
 
 ### feed
-
+#### `\`
+##### GET
+Returns the first 50 posts sorted by newest
 ### food

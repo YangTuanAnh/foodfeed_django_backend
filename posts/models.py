@@ -23,4 +23,4 @@ class Reaction(models.Model):
         unique_together = ('user', 'post')  # Ensure each user can react to a post only once
 
     def __str__(self):
-        return f'{self.user.username} reacted to {self.post.title}'
+        return f'{self.user.username} reacted to {self.post.id}'
