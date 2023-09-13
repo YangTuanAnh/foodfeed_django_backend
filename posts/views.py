@@ -56,6 +56,22 @@ def remove_special_characters_and_replace_spaces(input_string):
 
     return cleaned_string
 
+def uploadOntoS3(image_base64, image_name):
+    image_name = remove_special_characters_and_replace_spaces(image_name)
+    image_binary = base64.b64decode(image_base64)
+    file_obj = io.BytesIO(image_binary)
+    file_obj.seek(0)
+    file = io.BufferedReader(file_obj)
+
+    fileName = os.path.join(image_folder, image_name)
+    save_uploaded_file(file, fileName, image_folder)
+    
+    upload=supabase.storage.from_(BUCKET_NAME).upload(image_name, file, {"content-type": "image/png"})
+    
+    os.remove(fileName)
+    
+    return f'{STORAGE_URL}/storage/v1/object/public/{BUCKET_NAME}/{image_name}'
+    
 # Create your views here.
 @csrf_exempt
 def posts(request):
@@ -69,31 +85,18 @@ def posts(request):
         data = json.loads(request.body)
                 
         user = request.user
+        title = re.sub(r'<.*?>', '', data.get("title"))
         body = re.sub(r'<.*?>', '', data.get("body"))
-        if len(body)==0:
-            messages.error(request, "Missing body or image link")
-            return JsonResponse({"status": "Missing body or image link"}, status=302)
+        if len(body)==0 or len(title)==0:
+            messages.error(request, "Missing body or title")
+            return JsonResponse({"status": "Missing body or title"}, status=302)
         
         rating = data.get("rating")
         
         image_base64 = data.get("image_base64")
-        image_name = data.get("image_name")
+        image_name = data.get("image_name")      
         
-        image_name = remove_special_characters_and_replace_spaces(image_name)
-        
-        image_binary = base64.b64decode(image_base64)
-        file_obj = io.BytesIO(image_binary)
-        file_obj.seek(0)
-        file = io.BufferedReader(file_obj)
-
-        fileName = os.path.join(image_folder, image_name)
-        save_uploaded_file(file, fileName, image_folder)
-        
-
-        upload=supabase.storage.from_(BUCKET_NAME).upload(image_name, file, {"content-type": "image/png"})
-    
-        image_link = f'{STORAGE_URL}/storage/v1/object/public/{BUCKET_NAME}/{image_name}'
-        os.remove(fileName)
+        image_link = uploadOntoS3(image_base64, image_name)        
         
         post = Post.objects.create(user=user, body=body, rating=rating, image_link=image_link)
         
@@ -118,7 +121,7 @@ def post(request, post_id):
             return JsonResponse({"status": f"Did not found post {post_id}"}, status=404)
     if request.method=="DELETE":
         try:
-            post = Post.objects.delete(id=post_id)
+            post = Post.objects.delete(id=post_id, user=request.user)
             messages.success(request, f"Deleted post {post_id}")
             return JsonResponse({"status": f"Deleted post {post_id}"}, status=200)
         except Post.DoesNotExist:
@@ -134,7 +137,7 @@ def reactions(request, post_id):
         if request.method=="GET":
             reactions = Reaction.objects.filter(post=post)
             users = [row.user.id for row in reactions]
-            return JsonResponse({"Reaction count": len(users), "Users": users}, safe=False, status=200)
+            return JsonResponse({"count": len(users), "Users": users}, safe=False, status=200)
             
         elif request.method=='POST':
             existing_reaction = Reaction.objects.filter(user=request.user, post=post).first()

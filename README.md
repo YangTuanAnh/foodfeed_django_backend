@@ -1,4 +1,12 @@
-### Instruction
+# Foodfeed Backend Server
+## Technologies
+Database: PostgreSQL + S3 Bucket
+
+API Deployment: Django
+
+Server Deployment: Docker, AWS EC2 - Ubuntu Instance
+
+## Instruction
 
 0. Put the private files into folder foodfeed_app (.env and .json files)
 
@@ -55,3 +63,173 @@ conda install -r requirements.txt
     ```
 
 - If not using **ngrok**, just use the localhost [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
+
+## Documentation
+
+![Database Design](dbdesign.png)
+### /users
+#### `/login`
+Login to existing user in the database.
+##### POST
+```
+{
+  email: "yangtuananh2003@gmail.com",
+  password: 123456
+}
+```
+returns
+```
+{
+  status: "You are now logged in
+}
+```
+
+#### `/register`
+Create new user in case they haven't existed in the database.
+##### POST
+```
+{
+  full_name: "Yang Tuan Anh", 
+  username: "yangtuananh", 
+  email: "yangtuananh2003@gmail.com", 
+  phone_number: 91311699, 
+  password: 123456, 
+  password2: 123456
+}
+```
+if valid input and user hasnt existed, returns
+```
+{
+  status: "You are now logged in
+}
+```
+as automatic login after successful registration
+
+#### `/logout`
+Logout of current session.
+##### POST
+```
+{
+  status: "You are now logged out"
+}
+```
+#### `/profile`
+Login required, returns the profile of the currently logged in user.
+##### PUT
+```
+{
+  full_name: "Yang Tuấn Anh",
+  bio: "why would you buy a dragonfruit from Singapore just to show it off to your Vietnamese relatives as a Singaporean memorabilia",
+  avatar_base64: "[base64 of image]",
+  avatar_filename: "hetcuu.png"
+}
+```
+returns
+```
+{
+  status: "Updated successfully"
+}
+```
+##### GET
+```
+{
+  full_name: "Yang Tuấn Anh",
+  bio: "why would you buy a dragonfruit from Singapore just to show it off to your Vietnamese relatives as a Singaporean memorabilia",
+  avatar: "[s3 link of image]"
+}
+```
+#### `/profile/<int:user_id>`
+Returns the profile of a specified user id.
+##### GET
+```
+{
+  full_name: "Yang Tuấn Anh",
+  bio: "why would you buy a dragonfruit from Singapore just to show it off to your Vietnamese relatives as a Singaporean memorabilia",
+  avatar: "[s3 link of image]"
+}
+```
+### /posts
+#### `/`
+Returns current user's posts or submit new post.
+##### GET
+Returns
+```
+[{
+  id: 1,
+  user: "yangtuananh2003",
+  title: "Review cantin Sư Phạm",
+  body: "ngon nhưng đông vl",
+  rating: 5,
+  image_link: "[s3 link]",
+  create_at: "[timedate]"
+}, ...
+]
+```
+##### POST
+```
+{
+  title: "Review cantin KHTN",
+  body: "ngon qua", 
+  rating: 5, 
+  image_base64: "[base64 image]", 
+  image_name: "khtn.png"
+}
+```
+returns
+```
+{
+  status: "Created post 3743289"
+}
+```
+#### `/<int:post_id>`
+Returns post
+##### GET
+Returns
+```
+{
+  id: 1,
+  user: "yangtuananh2003",
+  title: "Review cantin Sư Phạm",
+  body: "ngon nhưng đông vl",
+  rating: 5,
+  image_link: "[s3 link]",
+  create_at: "[timedate]"
+}
+```
+Login required, only deletes posts that you made.
+
+##### DELETE
+```
+{
+  status: "Deleted post 23493915"
+}
+```
+
+#### `/reactions/<int:post_id>`
+Returns reactions for a post
+##### POST
+No input, returns
+```
+{
+  status: "yangtuananh2003 reacted to 12375839"
+}
+```
+if gave reaction, else if reacted
+```
+{
+  status: "Deleted reaction from 12375839"
+}
+```
+##### GET
+```
+{
+  count: 100
+}
+```
+### stores
+
+### feed
+#### `\`
+##### GET
+Returns the first 50 posts sorted by newest
+### food
