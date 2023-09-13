@@ -47,10 +47,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "corsheaders",
     "users",
+    "feed",
     "posts",
     "stores",
     "food",
-    "feed"
+    
 ]
 
 MIDDLEWARE = [
