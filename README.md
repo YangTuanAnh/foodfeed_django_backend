@@ -2,6 +2,8 @@
 ## Technologies
 Database: PostgreSQL + S3 Bucket
 
+Data Retrieval: BeautifulSoup + Selenium, crawled 29558 shops and 712,733 food items around Ho Chi Minh City
+
 API Deployment: Django
 
 Server Deployment: Docker, AWS EC2 - Ubuntu Instance

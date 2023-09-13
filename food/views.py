@@ -1,13 +1,12 @@
 from django.shortcuts import render
 from .models import Food, Store
-from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-import json
-
+from posts.views import uploadOntoS3
 from geopy.distance import geodesic
 
 # Create your views here.
+@csrf_exempt
 def food(request, food_id):
     if request.method == "GET":
         food = Food.objects.get(food_id)
@@ -17,6 +16,7 @@ def food(request, food_id):
             return JsonResponse({"status": "success", 'results': food}, status=200)
         
     elif request.method == "POST":
+        
         name = request.POST.get('name', '')
         store_id = int(request.POST.get('store_id', ''))
         price = float(request.POST.get('price', ''))
@@ -102,4 +102,4 @@ def search(request):
         return JsonResponse({"status": "success", "results": results}, status=200)
 
 def search_autocomplete(request):
-    pass
+    return HttpResponse("Autocomplete", status=200)
