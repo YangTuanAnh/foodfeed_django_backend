@@ -8,7 +8,7 @@ import json
 # Create your views here.
 
 @csrf_exempt
-def search(request):
+def search_autocomplete(request):
     if request.method == 'GET':
         query = request.GET.get('query', '')  # Get the search query from the request
         limit = int(request.GET.get('limit', 10))  # Get the number of results to display from the request
