@@ -111,15 +111,18 @@ def search(request):
         
         foods = Food.objects.filter(name__contains=query)
 
-        if latitude != 0 and longitude != 0 and distance != 0:
+        debug = True
+        if debug or (latitude != 0 and longitude != 0 and distance != 0):
             filtered_foods = []
             for food in foods:
                 store = Store.objects.get(food.store)
-                review = Post.objects.filter(food=food).latest('create_at')
-            if store:
-                food_distance = geodesic((latitude, longitude), (store.latitude, store.longitude)).km
-                if food_distance <= distance:
-                    filtered_foods.append({"food": food, "review": review})
+                if store:
+                    food_distance = geodesic((latitude, longitude), (store.latitude, store.longitude)).km
+                    if food_distance <= distance:
+                        review = Post.objects.filter(food=food).latest('create_at')
+                        if review.DoesNotExist():
+                            filtered_foods.append({"food": food, "review": None})
+                        else: filtered_foods.append({"food": food, "review": review})
 
             results = filtered_foods[offset:offset+limit]
         else:
