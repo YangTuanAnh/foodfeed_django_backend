@@ -154,9 +154,13 @@ Returns the profile of a specified user id.
 ##### GET
 Returns a list of user objects which are friends to the authenticated user.
 #### `/friends/<int:user_id>`
+Returns a list of user objects which are friends to the user with given id.
+
+#### `/friends/suggestions`
+Returns 5 random users (TODO: Use BFS to find closely unfriended users)
+
 ### /posts
 #### GET
-Returns a list of user objects which are friends to the user with given id.
 #### POST
 Login required. No input. If not friended, will add new connection between authenticated user and user with given user id. Else, then unfriend.
 #### `/`
