@@ -238,6 +238,7 @@ if gave reaction, else if reacted
 }
 ```
 #### `/reviews/<int:food_id>`
+##### GET
 Returns posts about that food item. Refer to `/<int:food_id>` for format.
 ### stores
 
