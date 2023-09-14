@@ -5,78 +5,97 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from posts.views import uploadOntoS3
 from geopy.distance import geodesic
-from django.core import serializers
 import json
 
 # Create your views here.
 @csrf_exempt
 def food(request, food_id):
     if request.method == "GET":
-        food = Food.objects.get(food_id)
+        food = Food.objects.get(id=food_id)
         if food is None:
             return JsonResponse({"status": f"Did not found food {food_id}"}, status=404)
         else:
+            # serialize the food object to JSON
+            food = {'id': food.id,
+                    'name': food.name,
+                    'store_id': food.store.id,
+                    'price': food.price,
+                    'image_link': food.image_link,}
             return JsonResponse({"status": "success", 'results': food}, status=200)
         
     elif request.method == "POST":
-        
-        name = request.POST.get('name', '')
-        store_id = int(request.POST.get('store_id', ''))
-        price = float(request.POST.get('price', ''))
+        data = json.loads(request.body)
 
-        # TODO: add image link
+        name = data.get('name', '')
+        store_id = int(data.get('store_id', ''))
+        price = float(data.get('price', ''))
+        image_base64 = data.get('image_base64', '')
+        image_name = data.get('image_name', '')
         
         # check if all fields are empty
-        if name == '' or store_id == '' or price == '':
+        if name == '' or store_id == '' or price == '' or image_base64 == '' or image_name == '':
             return JsonResponse({"status": "error", "message": "All fields must be filled"}, status=400)
         
         # check if store is not exists
         store = Store.objects.get(store_id)
         if store is None:
             return JsonResponse({"status": "error", "message": "Store does not exists"}, status=400)
-    
-        food = Food(name=name, store_id=store_id, price=price)
+
+        image_link = uploadOntoS3(image_base64, image_name)
+
+        food = Food(name=name, store=store_id, price=price, image_link=image_link)
         food.save()
 
-        return JsonResponse({"status": "success", "message": "Food added successfully"}, status=200)
+        return JsonResponse({"status": "success", "message": f"Added food {food.id}"}, status=200)
     
     elif request.method == "PUT":
-        name = request.POST.get('name', '')
-        store_id = int(request.POST.get('store_id', ''))
-        price = float(request.POST.get('price', ''))
-
-        # TODO: add image link
-
-        food = Food.objects.get(food_id)
+        food = Food.objects.get(id=food_id)
         if food is None:
             return JsonResponse({"status": "error", "message": "Food does not exists"}, status=400)
+        
+        data = json.loads(request.body)
 
-        if name == '' and store_id == '' and price == '':
-            return JsonResponse({"status": "error", "message": "At least one field must be filled"}, status=400)
+        name = data.get('name', '')
+        store_id = int(data.get('store_id', ''))
+        price = float(data.get('price', ''))
+        image_base64 = data.get('image_base64', '')
+        image_name = data.get('image_name', '')
+        
+        # check if all fields are empty
+        if name == '' and store_id == '' and price == '' and image_base64 == '' and image_name == '':
+            return JsonResponse({"status": "error", "message": "At least one fields must be filled"}, status=400)
+        
+        # check if store is not exists
+        store = Store.objects.get(store_id)
+        if store is None:
+            return JsonResponse({"status": "error", "message": f"Store {store_id} does not exists"}, status=400)
 
-        # Update each field
+        # Update each field if it is not empty
         if name != '':
             food.name = name
         if store_id != '':
-            food.store_id = store_id
+            food.store = store_id
         if price != '':
             food.price = price
+        if image_base64 != '' and image_link != '':
+            image_link = uploadOntoS3(image_base64, image_name)
+            food.image_link = image_link
         
         food.save()
 
-        return JsonResponse({"status": "success", "message": "Food updated successfully"}, status=200)
+        return JsonResponse({"status": "success", "message": f"Updated food {food.id}"}, status=200)
     
     elif request.method == "DELETE":
-        food = Food.objects.get(food_id)
+        food = Food.objects.get(id=food_id)
         if food is None:
-            return JsonResponse({"status": "error", "message": "Food does not exists"}, status=400)
+            return JsonResponse({"status": "error", "message": f"Food {food_id} does not exists"}, status=400)
 
         food.delete()
 
-        return JsonResponse({"status": "success", "message": "Food deleted successfully"}, status=200)
+        return JsonResponse({"status": "success", "message": f"Food {food_id} deleted successfully"}, status=200)
     
     else:
-        return JsonResponse({"status": "error", "message": "Method not allowed"}, status=405)
+        return HttpResponse("Food", status=200)
     
 def search(request):
     if request.method == "GET":
@@ -92,20 +111,36 @@ def search(request):
         
         foods = Food.objects.filter(name__contains=query)
 
-        filtered_foods = []
-        for food in foods:
-            store = Store.objects.get(food.store_id)
-            review = Post.objects.filter(food=food).latest('create_at')
+        if latitude != 0 and longitude != 0 and distance != 0:
+            filtered_foods = []
+            for food in foods:
+                store = Store.objects.get(food.store)
+                review = Post.objects.filter(food=food).latest('create_at')
             if store:
-                food_distance = geodesic((latitude, longitude), (store.latitude, store.longitude)).km
-                if food_distance <= distance:
-                    filtered_foods.append({"food": food, "review": review})
+                    food_distance = geodesic((latitude, longitude), (store.latitude, store.longitude)).km
+                    if food_distance <= distance:
+                        filtered_foods.append({"food": food, "review": review})
 
-        results = filtered_foods[offset:offset+limit]
+            results = filtered_foods[offset:offset+limit]
+        else:
+            results = foods[offset:offset+limit]
 
-        results_json = serializers.serialize('json', results)
-        
-        return JsonResponse({"status": "success", "results": json.load(results_json)}, safe=False, status=200)
+        print(query)
+        print(results)
+
+        # Serialize the results to JSON
+        serialized_results = [
+            {'id': food.id, 
+             'name': food.name,
+             'store_id': food.store.id,
+             'price': food.price, 
+             'image_link': food.image_link,}
+            for food in results
+        ]
+
+        print(serialized_results)
+
+        return JsonResponse({"status": "success", "results": serialized_results}, status=200)
 
 def search_autocomplete(request):
     return HttpResponse("Autocomplete", status=200)
