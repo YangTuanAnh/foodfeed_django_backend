@@ -12,7 +12,6 @@ from foodfeed_app.settings import STORAGE_URL, STORAGE_API_KEY, MEDIA_ROOT, BUCK
 from django.utils import timezone
 import os
 import io
-from django.core.serializers import serialize
 from supabase import create_client
 
 supabase = create_client(STORAGE_URL, STORAGE_API_KEY)

@@ -4,6 +4,8 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from posts.views import uploadOntoS3
 from geopy.distance import geodesic
+from django.core import serializers
+import json
 
 # Create your views here.
 @csrf_exempt
@@ -99,7 +101,9 @@ def search(request):
 
         results = filtered_foods[offset:offset+limit]
 
-        return JsonResponse({"status": "success", "results": results}, status=200)
+        results_json = serializers.serialize('json', results)
+        
+        return JsonResponse({"status": "success", "results": json.load(results_json)}, safe=False, status=200)
 
 def search_autocomplete(request):
     return HttpResponse("Autocomplete", status=200)
