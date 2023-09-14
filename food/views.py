@@ -112,7 +112,7 @@ def search(request):
         if query == '':
             return JsonResponse({"status": "error", "message": "Query must be filled"}, status=400)
         
-        foods = Food.objects.filter(name__contains=query)
+        foods = Food.objects.filter(name__contains=query)[:50]
 
         debug = True
 
@@ -122,21 +122,45 @@ def search(request):
 
         if debug or (latitude != 0 and longitude != 0 and distance != 0):
             filtered_foods = []
-            for idx, food in enumerate(foods):
-
-                if(idx >= 50):
-                    break
+            for food in foods:
                 store = Store.objects.get(id=food.store.id)
+                review = Post.objects.filter(food=food.id).order_by('create_at').first()
                 if store:
                     food_distance = geodesic((latitude, longitude), (store.latitude, store.longitude)).km
                     if debug or (food_distance <= distance):
-                        review = Post.objects.filter(food=food.id).order_by('create_at').first()
-                        
-                        if review is None or review.DoesNotExist():
-                            # append json serializable object
-                            filtered_foods.append({"food": food, "review": None})
-                        else: 
-                            filtered_foods.append({"food": food, "review": review})
+                        #filtered_foods.append({"food": food, "review": review})
+                        if review:
+                            filtered_foods.append({
+                                "food": {
+                                    "id": food.id,
+                                    "name": food.name,
+                                    "store": str(food.store),
+                                    "price": food.price,
+                                    "image_link": food.image_link
+                                },
+                                "review": {
+                                    "id": review.id,
+                                    "user": review.user,
+                                    "username": review.username,
+                                    "title": review.title,
+                                    "body": review.body,
+                                    "food": review.food,
+                                    "rating": review.rating,
+                                    "image_link": review.image_link,
+                                    "create_at": review.create_at
+                                }
+                            })
+                        else:
+                            filtered_foods.append({
+                                "food": {
+                                    "id": food.id,
+                                    "name": food.name,
+                                    "store": str(food.store),
+                                    "price": food.price,
+                                    "image_link": food.image_link
+                                },
+                                "review": None
+                            })
 
             results = filtered_foods[offset:offset+limit]
         else:
@@ -146,14 +170,11 @@ def search(request):
         # print(results)
 
         # Serialize the results to JSON, remember checking none and not make object to string
-        filtered_results = []
-        for result in results:
-            filtered_results.append({"food": result["food"], "review": result["review"]})
         
         #serialized_results = json.dumps(filtered_results, default=lambda o: o.__dict__, sort_keys=True, indent=4)
-        serialized_results = serializers.serialize('json', filtered_results)
-        print(serialized_results)
-        return JsonResponse({"status": "success", "results": json.loads(serialized_results)}, status=200)
+        #serialized_results = serializers.serialize('json', filtered_foods)
+        #print(serialized_results)
+        return JsonResponse({"status": "success", "results": filtered_foods}, status=200)
 
 def search_autocomplete(request):
     return HttpResponse("Autocomplete", status=200)
