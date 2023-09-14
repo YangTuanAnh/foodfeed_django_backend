@@ -4,6 +4,7 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages, auth
 from .models import Post, Reaction
+from food.models import Food
 import json
 from django.core import serializers
 import re
@@ -95,9 +96,13 @@ def posts(request):
         image_base64 = data.get("image_base64")
         image_name = data.get("image_name")      
         
+        food_id = data.get("food_id")
+        
+        food = Food.objects.get(id=food_id)
+        
         image_link = uploadOntoS3(image_base64, image_name)        
         
-        post = Post.objects.create(user=user, body=body, rating=rating, image_link=image_link)
+        post = Post.objects.create(user=user, body=body, rating=rating, food=food, image_link=image_link)
         
         return JsonResponse({"status": "Created post " + str(post.id)}, status="200")
         
