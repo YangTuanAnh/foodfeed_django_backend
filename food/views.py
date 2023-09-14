@@ -123,6 +123,10 @@ def search(request):
         if debug or (latitude != 0 and longitude != 0 and distance != 0):
             filtered_foods = []
             for food in foods:
+
+                if(len(filtered_foods) >= offset+limit):
+                    break
+
                 store = Store.objects.get(id=food.store.id)
                 review = Post.objects.filter(food=food.id).order_by('create_at').first()
                 if store:
