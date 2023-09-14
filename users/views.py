@@ -5,9 +5,11 @@ from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages, auth
 from .models import CustomUser as User
-from .models import Profile
+from .models import Profile, Friend
 from .backends import EmailBackend
+from django.db.models import Q
 import json
+from django.core import serializers
 from posts.views import uploadOntoS3
 
 # Create your views here.
@@ -142,3 +144,49 @@ def get_user(request, user_id):
             messages.error(f"User {user_id} does not exist")
             return JsonResponse({"status": f"User {user_id} does not exist"}, status=404)
 
+@login_required
+def friends(request):
+    if request.method=="GET":
+        user_friends = Friend.objects.filter(Q(user1=request.user) | Q(user2=request.user))
+        friends = []
+        
+        for friendship in user_friends:
+            if friendship.user1==request.user:
+                friends.append(friendship.user2)
+            else: friends.append(friendship.user1)
+            
+        friends_json = serializers.serialize('json', friends)
+        
+        return JsonResponse(friends_json, status=200)
+
+@csrf_exempt
+@login_required
+def make_friend(request, user_id):
+    if request.method=="GET":
+        user = User.objects.find(id=user_id)
+        user_friends = Friend.objects.filter(Q(user1=user) | Q(user2=user))
+        friends = []
+        
+        for friendship in user_friends:
+            if friendship.user1==user:
+                friends.append(friendship.user2)
+            else: friends.append(friendship.user1)
+            
+        friends_json = serializers.serialize('json', friends)
+        
+        return JsonResponse(friends_json, status=200)
+    elif request.method=="POST":
+        user1 = User.objects.find(id=request.user.id)
+        user2 = User.objects.find(id=user_id)
+        
+        exists = Friend.objects.filter(user1=user1, user2=user2).exists() or Friend.objects.filter(user1=user2, user2=user1).exists()
+        
+        if exists:
+            Friend.objects.delete(user1=user1, user2=user2)
+            Friend.objects.delete(user1=user2, user2=user1)
+            return JsonResponse(f"Removed friendship between {user1.id} and {user2.id}", status=200)
+        else:
+            friendship = Friend.objects.create(user1, user2)
+            friendship.save()
+            return JsonResponse(f"Added friendship between {user1.id} and {user2.id}", status=200)
+        

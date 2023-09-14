@@ -1,13 +1,16 @@
 from django.db import models
 from users.models import CustomUser as User
 from django.utils import timezone
+from food.models import Food
 
 # Create your models here.
 class Post(models.Model):
     id = models.AutoField(primary_key=True, unique=True)
     user = models.ForeignKey(User, to_field="id", on_delete=models.CASCADE, default=timezone.now().timestamp())
+    username = models.CharField(max_length=255, blank=False)
     title = models.CharField(max_length=255, blank=False)
     body = models.TextField(blank=False)
+    food = models.ForeignKey(Food, to_field="id", on_delete=models.CASCADE)
     rating = models.IntegerField(default=1)
     image_link = models.CharField(max_length=255)
     create_at = models.DateTimeField(default=timezone.now)
