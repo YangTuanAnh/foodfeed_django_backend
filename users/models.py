@@ -9,7 +9,7 @@ class Profile(models.Model):
     bio = models.CharField(max_length=255, blank=True)
     avatar = models.CharField(
         max_length=255,
-        default="https://storage.googleapis.com/avatar-a0439.appspot.com/avatar.png",
+        default="https://ppbcpbhpzrhbhikjrtbb.supabase.co/storage/v1/object/public/images/ntmcuitluhlo_1694650728.778543",
     )
     def __str__(self):
         return self.id

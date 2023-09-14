@@ -94,7 +94,7 @@ def posts(request):
         rating = data.get("rating")
         
         image_base64 = data.get("image_base64")
-        image_name = data.get("image_name")      
+        image_name = data.get("image_name") + ".jpg"   
         
         food_id = data.get("food_id")
         
