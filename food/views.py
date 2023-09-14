@@ -140,11 +140,11 @@ def search(request):
                                 },
                                 "review": {
                                     "id": review.id,
-                                    "user": review.user,
+                                    "user": review.user.id,
                                     "username": review.username,
                                     "title": review.title,
                                     "body": review.body,
-                                    "food": review.food,
+                                    "food": review.food.id,
                                     "rating": review.rating,
                                     "image_link": review.image_link,
                                     "create_at": review.create_at
