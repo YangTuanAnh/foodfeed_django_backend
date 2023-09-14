@@ -15,7 +15,7 @@ def tags(request):
             tag = Tag.objects.get(title=query)
             return JsonResponse({
                 "id": tag.id,
-                "name": tag.title,
+                "title": tag.title,
                 "store_id": tag.store.id
             }, status=200)
         except Tag.DoesNotExist:
