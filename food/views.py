@@ -91,9 +91,17 @@ def search(request):
         
         foods = Food.objects.filter(name__contains=query)
 
+        demo_foods = []
         filtered_foods = []
         for food in foods:
-            store = Store.objects.get(food.store_id)
+            if(len(demo_foods) >= limit + offset):
+                break
+            demo_foods.append(food)
+            store = None
+            try:
+                store = Store.objects.get(food.store)
+            except:
+                pass
             if store:
                 food_distance = geodesic((latitude, longitude), (store.latitude, store.longitude)).km
                 if food_distance <= distance:
@@ -101,9 +109,11 @@ def search(request):
 
         results = filtered_foods[offset:offset+limit]
 
+        results = demo_foods
+
         results_json = serializers.serialize('json', results)
         
-        return JsonResponse({"status": "success", "results": json.load(results_json)}, safe=False, status=200)
+        return JsonResponse({"status": "success", "results": json.loads(results_json)}, safe=False, status=200)
 
 def search_autocomplete(request):
     return HttpResponse("Autocomplete", status=200)
