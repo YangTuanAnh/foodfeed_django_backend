@@ -147,15 +147,9 @@ def get_user(request, user_id):
 @login_required
 def friends(request):
     if request.method=="GET":
-        user_friends = Friend.objects.filter(Q(user1=request.user) | Q(user2=request.user))
-        friends = []
-        
-        for friendship in user_friends:
-            if friendship.user1==request.user:
-                friends.append(friendship.user2)
-            else: friends.append(friendship.user1)
+        user_friends = Friend.objects.filter(user_from=request.user).values_list('user_to', flat=True)
             
-        friends_json = serializers.serialize('json', friends)
+        friends_json = serializers.serialize('json', user_friends)
         
         return JsonResponse(friends_json, status=200)
 
@@ -164,29 +158,21 @@ def friends(request):
 def make_friend(request, user_id):
     if request.method=="GET":
         user = User.objects.find(id=user_id)
-        user_friends = Friend.objects.filter(Q(user1=user) | Q(user2=user))
-        friends = []
-        
-        for friendship in user_friends:
-            if friendship.user1==user:
-                friends.append(friendship.user2)
-            else: friends.append(friendship.user1)
+        user_friends = Friend.objects.filter(user_from=user).values_list('user_to', flat=True)
             
-        friends_json = serializers.serialize('json', friends)
+        friends_json = serializers.serialize('json', user_friends)
         
         return JsonResponse(friends_json, status=200)
     elif request.method=="POST":
-        user1 = User.objects.find(id=request.user.id)
         user2 = User.objects.find(id=user_id)
         
-        exists = Friend.objects.filter(user1=user1, user2=user2).exists() or Friend.objects.filter(user1=user2, user2=user1).exists()
+        exists = Friend.objects.filter(user_from=request.user, user_to=user2).exists()
         
         if exists:
-            Friend.objects.delete(user1=user1, user2=user2)
-            Friend.objects.delete(user1=user2, user2=user1)
-            return JsonResponse(f"Removed friendship between {user1.id} and {user2.id}", status=200)
+            Friend.objects.delete(user_from=request.user, user_to=user2)
+            return JsonResponse(f"Removed friendship between {request.user.id} and {user2.id}", status=200)
         else:
-            friendship = Friend.objects.create(user1, user2)
+            friendship = Friend.objects.create(request.user, user2)
             friendship.save()
-            return JsonResponse(f"Added friendship between {user1.id} and {user2.id}", status=200)
+            return JsonResponse(f"Added friendship between {request.user.id} and {user2.id}", status=200)
         

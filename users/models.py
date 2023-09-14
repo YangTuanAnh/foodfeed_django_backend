@@ -19,11 +19,12 @@ class CustomUser(AbstractUser):
     profile = models.ForeignKey(Profile, to_field="id", on_delete=models.CASCADE, default=datetime.now().timestamp())
 
 class Friend(models.Model):
-    user1 = models.ForeignKey(CustomUser, to_field="id", on_delete=models.CASCADE, related_name="user1_friend")
-    user2 = models.ForeignKey(CustomUser, to_field="id", on_delete=models.CASCADE, related_name="user2_frield")
-
+    user_from = models.ForeignKey(CustomUser, to_field="id", on_delete=models.CASCADE, related_name="user_from")
+    user_to = models.ForeignKey(CustomUser, to_field="id", on_delete=models.CASCADE, related_name="user_to")
+    #accepted = models.BooleanField(default=False)
+    
     class Meta:
-        unique_together = ('user1', 'user2')
+        unique_together = ('user_from', 'user_to')
         
     def __str__(self):
         return f"{self.user1} and {self.user2}"
