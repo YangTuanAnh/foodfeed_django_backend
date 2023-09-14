@@ -98,11 +98,13 @@ def posts(request):
         
         food_id = data.get("food_id")
         
+        username = request.user.username
+        
         food = Food.objects.get(id=food_id)
         
         image_link = uploadOntoS3(image_base64, image_name)        
         
-        post = Post.objects.create(user=user, body=body, rating=rating, food=food, image_link=image_link)
+        post = Post.objects.create(user=user, body=body, rating=rating, food=food, image_link=image_link, username=username)
         
         return JsonResponse({"status": "Created post " + str(post.id)}, status="200")
         

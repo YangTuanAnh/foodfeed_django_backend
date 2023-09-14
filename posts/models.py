@@ -7,6 +7,7 @@ from food.models import Food
 class Post(models.Model):
     id = models.AutoField(primary_key=True, unique=True)
     user = models.ForeignKey(User, to_field="id", on_delete=models.CASCADE, default=timezone.now().timestamp())
+    username = models.CharField(max_length=255, blank=False)
     title = models.CharField(max_length=255, blank=False)
     body = models.TextField(blank=False)
     food = models.ForeignKey(Food, to_field="id", on_delete=models.CASCADE)
