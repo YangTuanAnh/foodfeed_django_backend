@@ -11,14 +11,16 @@ from django.views.decorators.csrf import csrf_exempt
 def tags(request):
     if request.method=="GET":
         query = request.GET.get('query', '')
-        tag = Tag.objects.get(name=query)
-        if tag.DoesNotExist():
+        try:
+            tag = Tag.objects.get(title=query)
+            return JsonResponse({
+                "id": tag.id,
+                "name": tag.title,
+                "store_id": tag.store.id
+            }, status=200)
+        except Tag.DoesNotExist:
             return JsonResponse({"status": "Tag does not exist"}, status=404)
-        return JsonResponse({
-            "id": tag.id,
-            "name": tag.name,
-            "store_id": tag.store
-        }, status=200)
+        
     elif request.method=="POST":
         query = request.POST.get('query', '')
         latitude = float(request.POST.get('latitude', '0'))
