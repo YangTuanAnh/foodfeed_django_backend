@@ -6,6 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from posts.views import uploadOntoS3
 from geopy.distance import geodesic
 import json
+from django.core import serializers
 
 # Create your views here.
 @csrf_exempt
@@ -105,6 +106,8 @@ def search(request):
         latitude = float(request.GET.get('latitude', '0'))
         longitude = float(request.GET.get('longitude', '0'))
         distance = float(request.GET.get('distance', '0'))
+
+    
         
         if query == '':
             return JsonResponse({"status": "error", "message": "Query must be filled"}, status=400)
@@ -112,17 +115,28 @@ def search(request):
         foods = Food.objects.filter(name__contains=query)
 
         debug = True
+
+        if(debug):
+            limit = 10
+            offset = 0
+
         if debug or (latitude != 0 and longitude != 0 and distance != 0):
             filtered_foods = []
-            for food in foods:
-                store = Store.objects.get(food.store)
+            for idx, food in enumerate(foods):
+
+                if(idx >= 50):
+                    break
+                store = Store.objects.get(id=food.store.id)
                 if store:
                     food_distance = geodesic((latitude, longitude), (store.latitude, store.longitude)).km
-                    if food_distance <= distance:
-                        review = Post.objects.filter(food=food).latest('create_at')
-                        if review.DoesNotExist():
+                    if debug or (food_distance <= distance):
+                        review = Post.objects.filter(food=food.id).order_by('create_at').first()
+                        
+                        if review is None or review.DoesNotExist():
+                            # append json serializable object
                             filtered_foods.append({"food": food, "review": None})
-                        else: filtered_foods.append({"food": food, "review": review})
+                        else: 
+                            filtered_foods.append({"food": food, "review": review})
 
             results = filtered_foods[offset:offset+limit]
         else:
@@ -131,17 +145,13 @@ def search(request):
         print(query)
         print(results)
 
-        # Serialize the results to JSON
-        serialized_results = [
-            {'id': food.id, 
-             'name': food.name,
-             'store_id': food.store.id,
-             'price': food.price, 
-             'image_link': food.image_link,}
-            for food in results
-        ]
-
-        print(serialized_results)
+        # Serialize the results to JSON, remember checking none
+        serialized_results = []
+        for result in results:
+            if result["review"] is None:
+                serialized_results.append({"food": serializers.serialize('json', [result["food"]])[1:-1], "review": None})
+            else:
+                serialized_results.append({"food": serializers.serialize('json', [result["food"]])[1:-1], "review": serializers.serialize('json', [result["review"]])[1:-1]})
 
         return JsonResponse({"status": "success", "results": serialized_results}, status=200)
 

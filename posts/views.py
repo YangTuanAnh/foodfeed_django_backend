@@ -162,6 +162,6 @@ def reactions(request, post_id):
 def food_reviews(request, food_id):
     if request.method=="GET":
         food = Food.objects.get(id=food_id)
-        posts = Post.objects.filter(food=food)
+        posts = Post.objects.filter(food=food)[:50]
         posts_json = serializers.serialize("json", posts)
         return JsonResponse(json.loads(posts_json), safe=False, status=200)
