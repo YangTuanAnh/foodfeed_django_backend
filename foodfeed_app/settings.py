@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     "posts",
     "stores",
     "food",
-    
+    "tags"
 ]
 
 MIDDLEWARE = [

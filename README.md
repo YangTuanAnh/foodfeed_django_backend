@@ -73,14 +73,14 @@ conda install -r requirements.txt
 #### `/login`
 Login to existing user in the database.
 ##### POST
-```
+```js
 {
   email: "yangtuananh2003@gmail.com",
   password: 123456
 }
 ```
 returns
-```
+```js
 {
   status: "You are now logged in
 }
@@ -89,7 +89,7 @@ returns
 #### `/register`
 Create new user in case they haven't existed in the database.
 ##### POST
-```
+```js
 {
   full_name: "Yang Tuan Anh", 
   username: "yangtuananh", 
@@ -100,7 +100,7 @@ Create new user in case they haven't existed in the database.
 }
 ```
 if valid input and user hasnt existed, returns
-```
+```js
 {
   status: "You are now logged in
 }
@@ -110,7 +110,7 @@ as automatic login after successful registration
 #### `/logout`
 Logout of current session.
 ##### POST
-```
+```js
 {
   status: "You are now logged out"
 }
@@ -118,7 +118,7 @@ Logout of current session.
 #### `/profile`
 Login required, returns the profile of the currently logged in user.
 ##### PUT
-```
+```js
 {
   full_name: "Yang Tuấn Anh",
   bio: "why would you buy a dragonfruit from Singapore just to show it off to your Vietnamese relatives as a Singaporean memorabilia",
@@ -127,13 +127,13 @@ Login required, returns the profile of the currently logged in user.
 }
 ```
 returns
-```
+```js
 {
   status: "Updated successfully"
 }
 ```
 ##### GET
-```
+```js
 {
   full_name: "Yang Tuấn Anh",
   bio: "why would you buy a dragonfruit from Singapore just to show it off to your Vietnamese relatives as a Singaporean memorabilia",
@@ -143,7 +143,7 @@ returns
 #### `/profile/<int:user_id>`
 Returns the profile of a specified user id.
 ##### GET
-```
+```js
 {
   full_name: "Yang Tuấn Anh",
   bio: "why would you buy a dragonfruit from Singapore just to show it off to your Vietnamese relatives as a Singaporean memorabilia",
@@ -163,7 +163,7 @@ Login required. No input. If not friended, will add new connection between authe
 Returns current user's posts or submit new post.
 ##### GET
 Returns
-```
+```js
 [{
   id: 1,
   user: "yangtuananh2003",
@@ -177,7 +177,7 @@ Returns
 ]
 ```
 ##### POST
-```
+```js
 {
   title: "Review cantin KHTN",
   body: "ngon qua", 
@@ -187,7 +187,7 @@ Returns
 }
 ```
 returns
-```
+```js
 {
   status: "Created post 3743289"
 }
@@ -196,7 +196,7 @@ returns
 Returns post
 ##### GET
 Returns
-```
+```js
 {
   id: 1,
   user: "yangtuananh2003",
@@ -211,7 +211,7 @@ Returns
 Login required, only deletes posts that you made.
 
 ##### DELETE
-```
+```js
 {
   status: "Deleted post 23493915"
 }
@@ -221,19 +221,19 @@ Login required, only deletes posts that you made.
 Returns reactions for a post
 ##### POST
 No input, returns
-```
+```js
 {
   status: "yangtuananh2003 reacted to 12375839"
 }
 ```
 if gave reaction, else if reacted
-```
+```js
 {
   status: "Deleted reaction from 12375839"
 }
 ```
 ##### GET
-```
+```js
 {
   count: 100
 }
@@ -248,3 +248,22 @@ Returns posts about that food item. Refer to `/<int:food_id>` for format.
 ##### GET
 Returns the first 50 posts sorted by newest
 ### food
+
+### tags
+#### `\`
+##### GET
+Takes in `query`, returns:
+```js
+{
+  id: 1,
+  title: "com_ga",
+  store: 24653
+}
+```
+##### POST
+Creates a new tag, if it hasnt existed yet. Input takes in `query`, `longitude`, `latitude`. Returns:
+```js
+{
+  status: "#com_ga was created with store $Dịch Vụ Đám Tiệc Ba Thu"
+} 
+```
