@@ -201,6 +201,7 @@ Returns
   user: "yangtuananh2003",
   title: "Review cantin Sư Phạm",
   body: "ngon nhưng đông vl",
+  food_id: 123,
   rating: 5,
   image_link: "[s3 link]",
   create_at: "[timedate]"
