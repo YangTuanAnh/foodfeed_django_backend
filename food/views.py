@@ -142,18 +142,18 @@ def search(request):
         else:
             results = foods[offset:offset+limit]
 
-        print(query)
-        print(results)
+        # print(query)
+        # print(results)
 
-        # Serialize the results to JSON, remember checking none
-        serialized_results = []
+        # Serialize the results to JSON, remember checking none and not make object to string
+        filtered_results = []
         for result in results:
-            if result["review"] is None:
-                serialized_results.append({"food": serializers.serialize('json', [result["food"]])[1:-1], "review": None})
-            else:
-                serialized_results.append({"food": serializers.serialize('json', [result["food"]])[1:-1], "review": serializers.serialize('json', [result["review"]])[1:-1]})
-
-        return JsonResponse({"status": "success", "results": serialized_results}, status=200)
+            filtered_results.append({"food": result["food"], "review": result["review"]})
+        
+        #serialized_results = json.dumps(filtered_results, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+        serialized_results = serializers.serialize('json', filtered_results)
+        print(serialized_results)
+        return JsonResponse({"status": "success", "results": json.loads(serialized_results)}, status=200)
 
 def search_autocomplete(request):
     return HttpResponse("Autocomplete", status=200)
