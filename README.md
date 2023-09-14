@@ -237,6 +237,8 @@ if gave reaction, else if reacted
   count: 100
 }
 ```
+#### `/reviews/<int:food_id>`
+Returns posts about that food item. Refer to `/<int:food_id>` for format.
 ### stores
 
 ### feed

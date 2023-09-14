@@ -156,3 +156,10 @@ def reactions(request, post_id):
     except Post.DoesNotExist:
         messages.error(request, f"Did not found post {post_id}")
         return JsonResponse({"status": f"Did not found post {post_id}"}, status=404)
+    
+def food_reviews(request, food_id):
+    if request.method=="GET":
+        food = Food.objects.get(id=food_id)
+        posts = Post.objects.filter(food=food)
+        posts_json = serializers.serialize("json", posts)
+        return JsonResponse(json.loads(posts_json), safe=False, status=200)
