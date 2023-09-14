@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .models import Food, Store
+from posts.models import Post
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from posts.views import uploadOntoS3
@@ -94,10 +95,11 @@ def search(request):
         filtered_foods = []
         for food in foods:
             store = Store.objects.get(food.store_id)
+            review = Post.objects.filter(food=food).latest('create_at')
             if store:
                 food_distance = geodesic((latitude, longitude), (store.latitude, store.longitude)).km
                 if food_distance <= distance:
-                    filtered_foods.append(food)
+                    filtered_foods.append({"food": food, "review": review})
 
         results = filtered_foods[offset:offset+limit]
 
