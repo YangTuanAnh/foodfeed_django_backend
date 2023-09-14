@@ -52,7 +52,7 @@ def remove_special_characters_and_replace_spaces(input_string):
     after_last_period = after_last_period.replace(' ', '_')
 
     # Concatenate the "before" and "after" parts with the last period
-    cleaned_string = cleaned_before_part + '_' + str(timezone.now().timestamp()) + after_last_period
+    cleaned_string = cleaned_before_part + '_' + str(timezone.now().timestamp()) + ".jpg"
 
     return cleaned_string
 
@@ -94,7 +94,7 @@ def posts(request):
         rating = data.get("rating")
         
         image_base64 = data.get("image_base64")
-        image_name = data.get("image_name") + ".jpg"   
+        image_name = data.get("image_name")
         
         food_id = data.get("food_id")
         
