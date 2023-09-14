@@ -150,7 +150,15 @@ Returns the profile of a specified user id.
   avatar: "[s3 link of image]"
 }
 ```
+#### `/friends`
+##### GET
+Returns a list of user objects which are friends to the authenticated user.
+#### `/friends/<int:user_id>`
 ### /posts
+#### GET
+Returns a list of user objects which are friends to the user with given id.
+#### POST
+Login required. No input. If not friended, will add new connection between authenticated user and user with given user id. Else, then unfriend.
 #### `/`
 Returns current user's posts or submit new post.
 ##### GET
@@ -162,6 +170,7 @@ Returns
   title: "Review cantin Sư Phạm",
   body: "ngon nhưng đông vl",
   rating: 5,
+  username: "daothit",
   image_link: "[s3 link]",
   create_at: "[timedate]"
 }, ...
@@ -193,6 +202,7 @@ Returns
   user: "yangtuananh2003",
   title: "Review cantin Sư Phạm",
   body: "ngon nhưng đông vl",
+  food_id: 123,
   rating: 5,
   image_link: "[s3 link]",
   create_at: "[timedate]"
@@ -228,6 +238,9 @@ if gave reaction, else if reacted
   count: 100
 }
 ```
+#### `/reviews/<int:food_id>`
+##### GET
+Returns posts about that food item. Refer to `/<int:food_id>` for format.
 ### stores
 
 ### feed

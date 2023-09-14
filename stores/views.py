@@ -29,8 +29,8 @@ def search_autocomplete(request):
         ]
 
         return JsonResponse(
-            {'status': "success", 'results': serialized_results, 'count': len(results)},
-            status=200
+            {'status': "success", 'results': json.load(serialized_results), 'count': len(results)},
+            safe=False, status=200
         )
     else:
         return HttpResponse("Search")

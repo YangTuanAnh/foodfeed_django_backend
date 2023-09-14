@@ -4,6 +4,7 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages, auth
 from .models import Post, Reaction
+from food.models import Food
 import json
 from django.core import serializers
 import re
@@ -12,7 +13,6 @@ from foodfeed_app.settings import STORAGE_URL, STORAGE_API_KEY, MEDIA_ROOT, BUCK
 from django.utils import timezone
 import os
 import io
-from django.core.serializers import serialize
 from supabase import create_client
 
 supabase = create_client(STORAGE_URL, STORAGE_API_KEY)
@@ -96,9 +96,15 @@ def posts(request):
         image_base64 = data.get("image_base64")
         image_name = data.get("image_name")      
         
+        food_id = data.get("food_id")
+        
+        username = request.user.username
+        
+        food = Food.objects.get(id=food_id)
+        
         image_link = uploadOntoS3(image_base64, image_name)        
         
-        post = Post.objects.create(user=user, body=body, rating=rating, image_link=image_link)
+        post = Post.objects.create(user=user, body=body, rating=rating, food=food, image_link=image_link, username=username)
         
         return JsonResponse({"status": "Created post " + str(post.id)}, status="200")
         
@@ -152,3 +158,10 @@ def reactions(request, post_id):
     except Post.DoesNotExist:
         messages.error(request, f"Did not found post {post_id}")
         return JsonResponse({"status": f"Did not found post {post_id}"}, status=404)
+    
+def food_reviews(request, food_id):
+    if request.method=="GET":
+        food = Food.objects.get(id=food_id)
+        posts = Post.objects.filter(food=food)
+        posts_json = serializers.serialize("json", posts)
+        return JsonResponse(json.loads(posts_json), safe=False, status=200)
