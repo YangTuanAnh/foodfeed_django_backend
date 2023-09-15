@@ -6,6 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from posts.views import uploadOntoS3
 from geopy.distance import geodesic
 import json
+from django.db.models.functions import Length
 from foodfeed_app.settings import REDIS_CONNECTION
 
 # Create your views here.
@@ -172,10 +173,10 @@ def search(request):
 
         l, r = 0, len(filtered_foods)-1
         while l<r:
-            if filtered_foods[r]["food"]["image_link"]!=DEFAULT_LINK:
+            if filtered_foods[l]["food"]["image_link"]==DEFAULT_LINK:
                 filtered_foods[l], filtered_foods[r] = filtered_foods[r], filtered_foods[l]
-                l=l+1
-            r=r-1
+                r -= 1
+            l += 1
                 
         # print(query)
         # print(results)
