@@ -194,7 +194,7 @@ def search_autocomplete(request):
         limit = int(request.GET.get('limit', '10'))
         
         if len(query)<3:
-            return JsonResponse([], status=200)
+            return JsonResponse([], safe=False, status=200)
         
         food_autocomplete = Food.objects.filter(name__startswith=query).order_by(Length("name").asc())
         food_autocomplete = food_autocomplete.values_list('name', flat=True).distinct()[offset:offset+limit]
