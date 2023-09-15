@@ -161,27 +161,28 @@ def friends(request):
 @login_required
 def make_friend(request, user_id):
     if request.method=="GET":
-        user = User.objects.find(id=user_id)
+        user = User.objects.get(id=user_id)
         user_friends = Friend.objects.filter(user_from=user).values_list('user_to', flat=True)
             
         friends_json = serializers.serialize('json', user_friends)
         
         return JsonResponse(friends_json, status=200)
     elif request.method=="POST":
-        user2 = User.objects.find(id=user_id)
+        user1 = User.objects.get(id=request.user.id)
+        user2 = User.objects.get(id=user_id)
         
-        exists = Friend.objects.filter(user_from=request.user, user_to=user2).exists()
+        exists = Friend.objects.get(user_from=user1, user_to=user2).exists()
         
         if exists:
-            Friend.objects.delete(user_from=request.user, user_to=user2)
+            exists.delete()
 
-            print("This is THE POST " + f"Removed friendship between {request.user.id} and {user2.id}")
+            print("This is THE POST " + f"Removed friendship between {user1.id} and {user2.id}")
 
-            return JsonResponse(f"Removed friendship between {request.user.id} and {user2.id}", status=200)
+            return JsonResponse(f"Removed friendship between {user1.id} and {user2.id}", status=200, safe = False)
         else:
-            friendship = Friend.objects.create(request.user, user2)
+            friendship = Friend(user_from=user1, user_to=user2)
             friendship.save()
-            return JsonResponse(f"Added friendship between {request.user.id} and {user2.id}", status=200)
+            return JsonResponse(f"Added friendship between {user1.id} and {user2.id}", status=200, safe = False)
         
 def suggestions(request):
     if request.method=="GET":

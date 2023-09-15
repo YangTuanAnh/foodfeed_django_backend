@@ -7,7 +7,7 @@ from posts.views import uploadOntoS3
 from geopy.distance import geodesic
 import json
 from django.db.models.functions import Length
-from django.core import serializers
+from foodfeed_app.settings import REDIS_CONNECTION
 
 # Create your views here.
 @csrf_exempt
@@ -108,6 +108,7 @@ def search(request):
         latitude = float(request.GET.get('latitude', '0'))
         longitude = float(request.GET.get('longitude', '0'))
         distance = float(request.GET.get('distance', '0'))
+
         
         if query == '':
             return JsonResponse({"status": "error", "message": "Query must be filled"}, status=400)
@@ -191,15 +192,18 @@ def search(request):
         return JsonResponse({"status": "success", "results": filtered_foods}, status=200)
 
 def search_autocomplete(request):
-    if request.method=="GET":
+    if request.method == "GET":
         query = request.GET.get('query', '')
-        offset = int(request.GET.get('offset', '0'))
         limit = int(request.GET.get('limit', '10'))
+        if query == '':
+            return JsonResponse({"status": "error", "message": "Query must be filled"}, status=400)
         
-        if len(query)<3:
-            return JsonResponse([], status=200)
+        results = REDIS_CONNECTION.zrangebylex("autocomplete", "[" + query, "[" + query + "\xff", start=0, num=limit)
+
+        results = [result.decode("utf-8") for result in results]
+
+        results = results[:limit]
         
-        food_autocomplete = Food.objects.filter(name__startswith=query).order_by(Length("name").asc())
-        food_autocomplete = food_autocomplete.values_list('name', flat=True).distinct()[offset:offset+limit]
-        food_autocomplete = list(food_autocomplete)
-        return JsonResponse(food_autocomplete, safe=False, status=200)
+        return JsonResponse({"status": "success", "results": results}, status=200)
+    else:
+        return HttpResponse("Autocomplete", status=200)
