@@ -186,6 +186,9 @@ def make_friend(request, user_id):
 def suggestions(request):
     if request.method=="GET":
         suggest_users = User.objects.exclude(id=request.user.id)
+        friends = Friend.objects.filter(user_from=request.user).values_list("user_to")
+        
+        suggest_users = suggest_users.exclude(user_to__in=list(friends))
         suggest_users = suggest_users.order_by('?')[:5]
         
         users_json = serializers.serialize('json', suggest_users)
