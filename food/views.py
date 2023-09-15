@@ -192,12 +192,5 @@ def search_autocomplete(request):
         query = request.GET.get('query', '')
         offset = int(request.GET.get('offset', '0'))
         limit = int(request.GET.get('limit', '10'))
-        food_autocomplete = Food.objects.filter(name__startswith=query)[offset:offset+limit]
-        food_json = [{
-            "id": food.id,
-            "name": food.name,
-            "store": str(food.store),
-            "price": food.price,
-            "image_link": food.image_link
-        } for food in food_autocomplete]
-        return JsonResponse(food_json, status=200)
+        food_autocomplete = Food.objects.filter(name__startswith=query).values_list("name", flat=True)[offset:offset+limit]
+        return JsonResponse(food_autocomplete, status=200)
