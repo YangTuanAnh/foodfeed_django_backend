@@ -204,7 +204,7 @@ def search_autocomplete(request):
 
         results = [result.decode("utf-8") for result in results]
         
-        #results = sorted(results, key=lambda x: len(x))
+        results = sorted(results, key=lambda x: len(x))
 
         results = results[:limit]
         
