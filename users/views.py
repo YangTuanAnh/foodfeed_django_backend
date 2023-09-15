@@ -155,7 +155,7 @@ def friends(request):
         #print("????????", friends_json)
         #print(json.load(friends_json))
         
-        return JsonResponse(json.loads(friends_json), status=200)
+        return JsonResponse(json.loads(friends_json), status=200, safe = False)
 
 @csrf_exempt
 @login_required
@@ -187,4 +187,4 @@ def suggestions(request):
         users_json = serializers.serialize('json', suggest_users)
         #print(users_json)
         #print("???", json.load(users_json))
-        return JsonResponse(json.loads(users_json), status=200)
+        return JsonResponse(json.loads(users_json), status=200, safe = False)
