@@ -98,6 +98,7 @@ def food(request, food_id):
     else:
         return HttpResponse("Food", status=200)
     
+DEFAULT_LINK="https://images.foody.vn/default/s120x120/shopeefood-deli-dish-no-image.png"
 def search(request):
     if request.method == "GET":
         query = request.GET.get('query', '')
@@ -169,6 +170,13 @@ def search(request):
         else:
             results = foods[offset:offset+limit]
 
+        l, r = 0, len(filtered_foods)-1
+        while l<r:
+            if filtered_foods[r].food.image_link!=DEFAULT_LINK:
+                filtered_foods[l], filtered_foods[r] = filtered_foods[r], filtered_foods[l]
+                l=l+1
+            r=r-1
+                
         # print(query)
         # print(results)
 
