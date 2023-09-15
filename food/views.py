@@ -187,4 +187,9 @@ def search(request):
         return JsonResponse({"status": "success", "results": filtered_foods}, status=200)
 
 def search_autocomplete(request):
-    return HttpResponse("Autocomplete", status=200)
+    if request.method=="GET":
+        query = request.GET.get('query', '')
+        offset = int(request.GET.get('offset', '0'))
+        limit = int(request.GET.get('limit', '10'))
+        food_autocomplete = Food.objects.filter(name__startswith=query).values_list("name", flat=True)[offset:offset+limit]
+        return JsonResponse(food_autocomplete, status=200)
