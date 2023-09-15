@@ -179,7 +179,7 @@ def make_friend(request, user_id):
 
             return JsonResponse(f"Removed friendship between {request.user.id} and {user2.id}", status=200)
         else:
-            friendship = Friend.objects.create(request.user, user2)
+            friendship = Friend(request.user, user2)
             friendship.save()
             return JsonResponse(f"Added friendship between {request.user.id} and {user2.id}", status=200)
         
