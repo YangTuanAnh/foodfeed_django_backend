@@ -171,15 +171,14 @@ def make_friend(request, user_id):
         user1 = User.objects.get(id=request.user.id)
         user2 = User.objects.get(id=user_id)
         
-        exists = Friend.objects.get(user_from=user1, user_to=user2).exists()
-        
-        if exists:
+        try:
+            exists = Friend.objects.get(user_from=user1, user_to=user2).exists()
             exists.delete()
 
             print("This is THE POST " + f"Removed friendship between {user1.id} and {user2.id}")
 
             return JsonResponse(f"Removed friendship between {user1.id} and {user2.id}", status=200, safe = False)
-        else:
+        except Friend.DoesNotExist:
             friendship = Friend(user_from=user1, user_to=user2)
             friendship.save()
             return JsonResponse(f"Added friendship between {user1.id} and {user2.id}", status=200, safe = False)
