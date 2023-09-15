@@ -152,10 +152,10 @@ def friends(request):
         friends_json = serializers.serialize('json', user_friends)
 
         #The following lines are for debugging reason
-        print("????????", friends_json)
-        print(json.load(friends_json))
+        #print("????????", friends_json)
+        #print(json.load(friends_json))
         
-        return JsonResponse(json.load(friends_json), status=200)
+        return JsonResponse(json.loads(friends_json), status=200)
 
 @csrf_exempt
 @login_required
@@ -185,5 +185,6 @@ def suggestions(request):
         suggest_users = User.objects.exclude(id=request.user.id)
         suggest_users = User.objects.order_by('?')[:5]
         users_json = serializers.serialize('json', suggest_users)
-        print(users_json)
-        return JsonResponse(json.load(users_json), status=200)
+        #print(users_json)
+        #print("???", json.load(users_json))
+        return JsonResponse(json.loads(users_json), status=200)
