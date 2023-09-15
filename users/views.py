@@ -161,14 +161,14 @@ def friends(request):
 @login_required
 def make_friend(request, user_id):
     if request.method=="GET":
-        user = User.objects.find(id=user_id)
+        user = User.objects.get(id=user_id)
         user_friends = Friend.objects.filter(user_from=user).values_list('user_to', flat=True)
             
         friends_json = serializers.serialize('json', user_friends)
         
         return JsonResponse(friends_json, status=200)
     elif request.method=="POST":
-        user2 = User.objects.find(id=user_id)
+        user2 = User.objects.get(id=user_id)
         
         exists = Friend.objects.filter(user_from=request.user, user_to=user2).exists()
         
