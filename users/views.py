@@ -182,7 +182,7 @@ def make_friend(request, user_id):
         
 def suggestions(request):
     if request.method=="GET":
-        suggest_users = User.objects.exclude(request.user)
+        suggest_users = User.objects.exclude(id=request.user.id)
         suggest_users = User.objects.order_by('?')[:5]
         users_json = serializers.serialize('json', suggest_users)
         print(users_json)
