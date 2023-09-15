@@ -134,14 +134,14 @@ def get_user(request, user_id):
         try:
             user = User.objects.get(id=user_id)
             profile = user.profile
-            messages.success(f"Found user {user_id}")
+            #messages.success(f"Found user {user_id}")
             return JsonResponse({
                 "full_name": profile.full_name,
                 "bio": profile.bio,
                 "avatar": profile.avatar
             }, status=200)
         except User.DoesNotExist:
-            messages.error(f"User {user_id} does not exist")
+            #messages.error(f"User {user_id} does not exist")
             return JsonResponse({"status": f"User {user_id} does not exist"}, status=404)
 
 @login_required

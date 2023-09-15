@@ -173,10 +173,13 @@ def search(request):
 
         l, r = 0, len(filtered_foods)-1
         while l<r:
-            if filtered_foods[l]["food"]["image_link"]==DEFAULT_LINK:
+            if filtered_foods[r]["food"]["image_link"]!=DEFAULT_LINK and filtered_foods[l]["food"]["image_link"]==DEFAULT_LINK:
                 filtered_foods[l], filtered_foods[r] = filtered_foods[r], filtered_foods[l]
-                r -= 1
-            l += 1
+            if filtered_foods[l]["food"]["image_link"]!=DEFAULT_LINK:
+                l+=1
+            if filtered_foods[r]["food"]["image_link"]==DEFAULT_LINK:
+                r-=1
+                
                 
         # print(query)
         # print(results)
