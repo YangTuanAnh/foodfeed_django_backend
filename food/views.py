@@ -107,7 +107,6 @@ def search(request):
         longitude = float(request.GET.get('longitude', '0'))
         distance = float(request.GET.get('distance', '0'))
 
-    
         
         if query == '':
             return JsonResponse({"status": "error", "message": "Query must be filled"}, status=400)

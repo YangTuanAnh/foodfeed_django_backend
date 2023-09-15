@@ -40,9 +40,9 @@ def stores(request, store_id):
     if request.method == "GET":
         store = Store.objects.get(store_id)
         if store is None:
-            return JsonResponse({"status": f"Did not found store {store_id}"}, status=404)
+            return JsonResponse({"status": f"Did not found store {store_id}", "result" : None}, status=404)
         else:
-            return JsonResponse({"status": "success", 'results': store}, status=200)
+            return JsonResponse({"status": "success", 'result': store}, status=200)
     
     elif request.method == "POST":
         name = request.POST.get('name', '')
