@@ -149,11 +149,11 @@ def friends(request):
     if request.method=="GET":
         user_friends = Friend.objects.filter(user_from=request.user).values_list('user_to', flat=True)
             
-        friends_json = serializers.serialize('json', user_friends)
+        friends_json = json.dumps(list(user_friends))
 
         #The following lines are for debugging reason
-        #print("????????", friends_json)
-        #print(json.load(friends_json))
+        print("????????", friends_json)
+        print(json.loads(friends_json))
         
         return JsonResponse(json.loads(friends_json), status=200, safe = False)
 
@@ -171,15 +171,12 @@ def make_friend(request, user_id):
         user1 = User.objects.get(id=request.user.id)
         user2 = User.objects.get(id=user_id)
         
-        exists = Friend.objects.get(user_from=user1, user_to=user2).exists()
-        
-        if exists:
+        try:
+            exists = Friend.objects.get(user_from=user1, user_to=user2).exists()
             exists.delete()
-
             print("This is THE POST " + f"Removed friendship between {user1.id} and {user2.id}")
-
             return JsonResponse(f"Removed friendship between {user1.id} and {user2.id}", status=200, safe = False)
-        else:
+        except:
             friendship = Friend(user_from=user1, user_to=user2)
             friendship.save()
             return JsonResponse(f"Added friendship between {user1.id} and {user2.id}", status=200, safe = False)
