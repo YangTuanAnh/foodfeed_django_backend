@@ -198,14 +198,14 @@ def search_autocomplete(request):
         
         query = re.sub(r'^\s+$', '', query)
         if len(query)<3:
-            return JsonResponse({"status": "error", "results": []}, status=400)
+            return JsonResponse({"status": "error", "results": []}, status=200)
         
         results = REDIS_CONNECTION.zrangebylex("autocomplete", "[" + query, "[" + query + "\xff", start=0, num=limit)
 
-        results = [result.decode("utf-8") for result in results]
+        results = [re.sub(r'\s+', ' ', re.sub(r'[^\s\w\dÀ-ÿ]+', '', result.decode("utf-8"))).strip() for result in results]
         
         results = sorted(results, key=lambda x: len(x))
-
+        
         results = results[:limit]
         
         return JsonResponse({"status": "success", "results": results}, status=200)
