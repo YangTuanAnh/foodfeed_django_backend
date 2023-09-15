@@ -197,6 +197,6 @@ def search_autocomplete(request):
             return JsonResponse([], status=200)
         
         food_autocomplete = Food.objects.filter(name__startswith=query).order_by(Length("name").asc())
-        food_autocomplete = food_autocomplete.values_list('name', flat=True).distinct()[:10]
+        food_autocomplete = food_autocomplete.values_list('name', flat=True).distinct()[offset:offset+limit]
         food_autocomplete = list(food_autocomplete)
         return JsonResponse(food_autocomplete, safe=False, status=200)
