@@ -8,7 +8,7 @@ from geopy.distance import geodesic
 import json
 from django.db.models.functions import Length
 from foodfeed_app.settings import REDIS_CONNECTION
-
+import re
 # Create your views here.
 @csrf_exempt
 def food(request, food_id):
@@ -192,12 +192,16 @@ def search_autocomplete(request):
     if request.method == "GET":
         query = request.GET.get('query', '')
         limit = int(request.GET.get('limit', '10'))
-        if query == '':
-            return JsonResponse({"status": "error", "message": "Query must be filled"}, status=400)
+        
+        query = re.sub(r'^\s+$', '', query)
+        if len(query)<3:
+            return JsonResponse({"status": "error", "results": []}, status=400)
         
         results = REDIS_CONNECTION.zrangebylex("autocomplete", "[" + query, "[" + query + "\xff", start=0, num=limit)
 
         results = [result.decode("utf-8") for result in results]
+        
+        results = sorted(results, key=lambda x: len(x))
 
         results = results[:limit]
         
