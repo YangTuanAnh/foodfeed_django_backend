@@ -108,7 +108,6 @@ def search(request):
         latitude = float(request.GET.get('latitude', '0'))
         longitude = float(request.GET.get('longitude', '0'))
         distance = float(request.GET.get('distance', '0'))
-
         
         if query == '':
             return JsonResponse({"status": "error", "message": "Query must be filled"}, status=400)
@@ -173,10 +172,10 @@ def search(request):
 
         l, r = 0, len(filtered_foods)-1
         while l<r:
-            if filtered_foods[r]["food"]["image_link"]!=DEFAULT_LINK:
+            if filtered_foods[l]["food"]["image_link"]==DEFAULT_LINK:
                 filtered_foods[l], filtered_foods[r] = filtered_foods[r], filtered_foods[l]
-                l=l+1
-            r=r-1
+                r -= 1
+            l += 1
                 
         # print(query)
         # print(results)
