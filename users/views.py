@@ -171,10 +171,10 @@ def make_friend(request, user_id):
         user1 = User.objects.get(id=request.user.id)
         user2 = User.objects.get(id=user_id)
         
-        exists = Friend.objects.filter(user_from=user1, user_to=user2).exists()
+        exists = Friend.objects.get(user_from=user1, user_to=user2).exists()
         
         if exists:
-            Friend.objects.delete(user_from=user1, user_to=user2)
+            exists.delete()
 
             print("This is THE POST " + f"Removed friendship between {user1.id} and {user2.id}")
 
