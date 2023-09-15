@@ -151,7 +151,7 @@ def friends(request):
             
         friends_json = serializers.serialize('json', user_friends)
         
-        return JsonResponse(friends_json, status=200)
+        return JsonResponse(json.load(friends_json), status=200)
 
 @csrf_exempt
 @login_required
@@ -176,3 +176,9 @@ def make_friend(request, user_id):
             friendship.save()
             return JsonResponse(f"Added friendship between {request.user.id} and {user2.id}", status=200)
         
+def suggestions(request):
+    if request.method=="GET":
+        suggest_users = User.objects.exclude(request.user)
+        suggest_users = User.objects.order_by('?')[:5]
+        users_json = serializers.serialize('json', suggest_users)
+        return JsonResponse(json.load(users_json), status=200)
