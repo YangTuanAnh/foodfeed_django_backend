@@ -176,7 +176,7 @@ def make_friend(request, user_id):
             exists.delete()
             print("This is THE POST " + f"Removed friendship between {user1.id} and {user2.id}")
             return JsonResponse(f"Removed friendship between {user1.id} and {user2.id}", status=200, safe = False)
-        except:
+        except Friend.DoesNotExist:
             friendship = Friend(user_from=user1, user_to=user2)
             friendship.save()
             return JsonResponse(f"Added friendship between {user1.id} and {user2.id}", status=200, safe = False)
@@ -184,6 +184,10 @@ def make_friend(request, user_id):
 def suggestions(request):
     if request.method=="GET":
         suggest_users = User.objects.exclude(id=request.user.id)
-        suggest_users = User.objects.order_by('?')[:5]
+        friends = Friend.objects.filter(user_from=request.user).values_list("user_to")
+        
+        suggest_users = suggest_users.exclude(user_to__in=list(friends))
+        suggest_users = suggest_users.order_by('?')[:5]
+        
         users_json = serializers.serialize('json', suggest_users)
         return JsonResponse(json.loads(users_json), status=200, safe = False)
