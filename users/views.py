@@ -168,20 +168,21 @@ def make_friend(request, user_id):
         
         return JsonResponse(friends_json, status=200)
     elif request.method=="POST":
+        user1 = User.objects.get(id=request.user.id)
         user2 = User.objects.get(id=user_id)
         
-        exists = Friend.objects.filter(user_from=request.user, user_to=user2).exists()
+        exists = Friend.objects.filter(user_from=user1, user_to=user2).exists()
         
         if exists:
-            Friend.objects.delete(user_from=request.user, user_to=user2)
+            Friend.objects.delete(user_from=user1, user_to=user2)
 
-            print("This is THE POST " + f"Removed friendship between {request.user.id} and {user2.id}")
+            print("This is THE POST " + f"Removed friendship between {user1.id} and {user2.id}")
 
-            return JsonResponse(f"Removed friendship between {request.user.id} and {user2.id}", status=200)
+            return JsonResponse(f"Removed friendship between {user1.id} and {user2.id}", status=200)
         else:
-            friendship = Friend(request.user, user2)
+            friendship = Friend(user1, user2)
             friendship.save()
-            return JsonResponse(f"Added friendship between {request.user.id} and {user2.id}", status=200)
+            return JsonResponse(f"Added friendship between {user1.id} and {user2.id}", status=200)
         
 def suggestions(request):
     if request.method=="GET":
