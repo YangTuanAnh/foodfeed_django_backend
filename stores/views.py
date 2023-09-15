@@ -38,11 +38,11 @@ def search_autocomplete(request):
 @csrf_exempt
 def stores(request, store_id):
     if request.method == "GET":
-        store = Store.objects.get(store_id)
-        if store is None:
-            return JsonResponse({"status": f"Did not found store {store_id}", "result" : None}, status=404)
-        else:
+        try:
+            store = Store.objects.get(id = store_id)
             return JsonResponse({"status": "success", 'result': store}, status=200)
+        except:
+            return JsonResponse({"status": f"Did not found store {store_id}", "result" : None}, status=404)
     
     elif request.method == "POST":
         name = request.POST.get('name', '')
