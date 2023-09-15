@@ -150,6 +150,9 @@ def friends(request):
         user_friends = Friend.objects.filter(user_from=request.user).values_list('user_to', flat=True)
             
         friends_json = serializers.serialize('json', user_friends)
+
+        #The following is for debugging reason
+        print(json.load(friends_json))
         
         return JsonResponse(json.load(friends_json), status=200)
 
