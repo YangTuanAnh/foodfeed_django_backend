@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from posts.views import uploadOntoS3
 from geopy.distance import geodesic
 import json
-from django.core import serializers
+from foodfeed_app.settings import REDIS_CONNECTION
 
 # Create your views here.
 @csrf_exempt
@@ -188,4 +188,18 @@ def search(request):
         return JsonResponse({"status": "success", "results": filtered_foods}, status=200)
 
 def search_autocomplete(request):
-    return HttpResponse("Autocomplete", status=200)
+    if request.method == "GET":
+        query = request.GET.get('query', '')
+        limit = int(request.GET.get('limit', '10'))
+        if query == '':
+            return JsonResponse({"status": "error", "message": "Query must be filled"}, status=400)
+        
+        results = REDIS_CONNECTION.zrangebylex("autocomplete", "[" + query, "[" + query + "\xff", start=0, num=limit)
+
+        results = [result.decode("utf-8") for result in results]
+
+        results = results[:limit]
+        
+        return JsonResponse({"status": "success", "results": results}, status=200)
+    else:
+        return HttpResponse("Autocomplete", status=200)

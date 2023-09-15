@@ -33,3 +33,6 @@ typing_extensions==4.7.1
 tzdata==2023.3
 websockets==10.4
 wheel==0.38.4
+
+django-redis==5.3.0
+redis==5.0.0

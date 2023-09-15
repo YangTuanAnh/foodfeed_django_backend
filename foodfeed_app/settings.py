@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+import redis
 
 from dotenv import load_dotenv
 
@@ -109,6 +110,24 @@ DATABASES = {
         "PORT": os.environ.get("DATABASE_PORT")
     }
 }
+
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django_redis.cache.RedisCache',
+#         'LOCATION': 'redis://default:d6JnWxJrfE7531MKIljnsD7Tf07oPkoY@redis-13158.c302.asia-northeast1-1.gce.cloud.redislabs.com:13158',
+#         'OPTIONS': {
+#             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+#         }
+#     }
+# }
+
+# Redis connection settings
+REDIS_HOST = os.environ.get("REDIS_HOST")
+REDIS_PORT = os.environ.get("REDIS_PORT")
+REDIS_PASSWORD = os.environ.get("REDIS_PASS")
+
+# Create a Redis connection
+REDIS_CONNECTION = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD, db=0)
 
 STORAGE_URL = os.environ.get("STORAGE_URL")
 STORAGE_API_KEY = os.environ.get("STORAGE_API_KEY")
