@@ -163,5 +163,18 @@ def food_reviews(request, food_id):
     if request.method=="GET":
         food = Food.objects.get(id=food_id)
         posts = Post.objects.filter(food=food)[:50]
-        posts_json = serializers.serialize("json", posts)
-        return JsonResponse(json.loads(posts_json), safe=False, status=200)
+        posts = [
+            {
+                "id": post.id,
+                "user": post.user.id,
+                "title": post.title,
+                "body": post.body,
+                "rating": post.rating,
+                "image_link": post.image_link,
+                "username": post.username,
+                "created_at": post.created_at,
+            }
+            for post in posts
+        ]
+
+        return JsonResponse(posts, safe=False, status=200)

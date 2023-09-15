@@ -6,6 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from posts.views import uploadOntoS3
 from geopy.distance import geodesic
 import json
+from django.db.models.functions import Length
 from django.core import serializers
 
 # Create your views here.
@@ -107,7 +108,6 @@ def search(request):
         latitude = float(request.GET.get('latitude', '0'))
         longitude = float(request.GET.get('longitude', '0'))
         distance = float(request.GET.get('distance', '0'))
-
         
         if query == '':
             return JsonResponse({"status": "error", "message": "Query must be filled"}, status=400)
@@ -172,10 +172,10 @@ def search(request):
 
         l, r = 0, len(filtered_foods)-1
         while l<r:
-            if filtered_foods[r]["food"]["image_link"]!=DEFAULT_LINK:
+            if filtered_foods[l]["food"]["image_link"]==DEFAULT_LINK:
                 filtered_foods[l], filtered_foods[r] = filtered_foods[r], filtered_foods[l]
-                l=l+1
-            r=r-1
+                r -= 1
+            l += 1
                 
         # print(query)
         # print(results)
@@ -192,5 +192,11 @@ def search_autocomplete(request):
         query = request.GET.get('query', '')
         offset = int(request.GET.get('offset', '0'))
         limit = int(request.GET.get('limit', '10'))
-        food_autocomplete = Food.objects.filter(name__startswith=query).values_list("name", flat=True)[offset:offset+limit]
-        return JsonResponse(food_autocomplete, status=200)
+        
+        if len(query)<3:
+            return JsonResponse([], status=200)
+        
+        food_autocomplete = Food.objects.filter(name__startswith=query).order_by(Length("name").asc())
+        food_autocomplete = food_autocomplete.values_list('name', flat=True).distinct()[:10]
+        food_autocomplete = list(food_autocomplete)
+        return JsonResponse(food_autocomplete, safe=False, status=200)
