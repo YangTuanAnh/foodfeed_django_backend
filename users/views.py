@@ -178,11 +178,11 @@ def make_friend(request, user_id):
 
             print("This is THE POST " + f"Removed friendship between {user1.id} and {user2.id}")
 
-            return JsonResponse(f"Removed friendship between {user1.id} and {user2.id}", status=200)
+            return JsonResponse(f"Removed friendship between {user1.id} and {user2.id}", status=200, safe = False)
         else:
-            friendship = Friend(user1, user2)
+            friendship = Friend(user_from=user1, user_to=user2)
             friendship.save()
-            return JsonResponse(f"Added friendship between {user1.id} and {user2.id}", status=200)
+            return JsonResponse(f"Added friendship between {user1.id} and {user2.id}", status=200, safe = False)
         
 def suggestions(request):
     if request.method=="GET":
