@@ -2,7 +2,7 @@
 ## Technologies
 Storage: PostgreSQL (Database) + S3 Bucket (File blobs) + Redis (In-memory caching)
 
-Data Retrieval: BeautifulSoup + Selenium, crawled 29558 shops and 712,733 food items around Ho Chi Minh City
+Data Retrieval: BeautifulSoup + Selenium, crawled **29558** shops and **712,733** food items around **Ho Chi Minh City**
 
 API Deployment: Django
 
