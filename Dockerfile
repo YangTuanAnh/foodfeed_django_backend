@@ -6,7 +6,7 @@ COPY ./requirements.txt requirements.txt
 
 RUN pip install -r requirements.txt
 
-RUN pip install python-dotenv supabase psycopg2-binary django-cors-headers
+RUN pip install python-dotenv supabase psycopg2-binary django-cors-headers geopy redis
 
 COPY . .
 
