@@ -52,6 +52,7 @@ def register(request):
                     auth.login(request, user, 'users.backends.EmailBackend')
                     # messages.success(request, 'You are now logged in')
                     
+                    
                     user.save()
                     messages.success(request, 'You are now registered and can log in')
                     return JsonResponse(
