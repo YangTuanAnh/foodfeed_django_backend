@@ -75,12 +75,12 @@ def uploadOntoS3(image_base64, image_name):
 # Create your views here.
 @csrf_exempt
 def posts(request):
-    user = auth.get_user(request)
-    if user is None: 
-        if request.method=="GET":
-            return HttpResponse("Posts")
-        else: 
-            return JsonResponse({"status": "Not authenticated"}, status=403)
+    if not request.user.is_authenticated:
+        return JsonResponse(
+            {"status": "Unauthenticated"},
+            status=400
+        )
+    
     if request.method=="POST":
         data = json.loads(request.body)
                 
