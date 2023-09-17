@@ -31,7 +31,11 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*", "13.229.250.243"]
+ALLOWED_HOSTS = ["13.229.250.243"]
+
+SESSION_COOKIE_DOMAIN = "13.229.250.243"
+
+SESSION_COOKIE_SECURE = False
 
 # for instant deploying the website using ngrok platform
 CSRF_TRUSTED_ORIGINS = ["https://*.ngrok-free.app", "http://127.0.0.1", "http://0.0.0.0"]
