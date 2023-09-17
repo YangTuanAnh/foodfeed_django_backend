@@ -49,14 +49,15 @@ def register(request):
                     profile = Profile.objects.create(full_name=full_name)
                     user = User.objects.create_user(username=username, password=password,email=email, phone_number=phone_number, profile=profile)
                     # Login after register
-                    auth.login(request, user)
-                    messages.success(request, 'You are now logged in')
+                    auth.login(request, user, 'users.backends.EmailBackend')
+                    # messages.success(request, 'You are now logged in')
+                    
+                    user.save()
+                    messages.success(request, 'You are now registered and can log in')
                     return JsonResponse(
-                        {"status": 'You are now logged in'},
+                        {"status": 'You are now registered and can log in'},
                         status=200
                     )
-                    # user.save()
-                    # messages.success(request, 'You are now registered and can log in')
                     # return redirect('login')
         else:
             messages.error(request, 'Passwords do not match')
