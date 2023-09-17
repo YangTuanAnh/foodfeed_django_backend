@@ -107,7 +107,7 @@ def logout(request):
             status=400
         )
     if request.method=="POST":
-        auth.logout(request.user)
+        auth.logout(request)
         messages.success(request, "You are now logged out")
         return JsonResponse(
             {"status": "You are now logged out"},
