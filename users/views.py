@@ -83,7 +83,7 @@ def login(request):
             #debug here
             print("user is not none")
 
-            auth.login(request, user)
+            auth.login(request, user, emailBackend)
             messages.success(request, 'You are now logged in')
             return JsonResponse(
                 {"status": "You are now logged in"},
