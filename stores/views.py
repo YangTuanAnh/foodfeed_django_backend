@@ -40,7 +40,9 @@ def stores(request, store_id):
     if request.method == "GET":
         try:
             store = Store.objects.get(id = store_id)
-            return JsonResponse({"status": "success", 'result': store}, status=200)
+
+            results = {'name': store.name, 'address': store.address, 'latitude': store.latitude, 'longitude': store.longitude}
+            return JsonResponse({"status": "success", 'result': results}, status=200)
         except Store.DoesNotExist:
             return JsonResponse({"status": f"Did not found store {store_id}", "result" : None}, status=404)
     
