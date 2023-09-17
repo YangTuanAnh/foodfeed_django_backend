@@ -49,6 +49,7 @@ def stores(request, store_id):
                 "avg_rating": store.avg_rating,
                 "image_link": store.image_link,
             }
+            
             return JsonResponse({"status": "success", 'result': store_json}, status=200)
         except Store.DoesNotExist:
             return JsonResponse({"status": f"Did not found store {store_id}", "result" : None}, status=404)
