@@ -49,7 +49,7 @@ def register(request):
                     profile = Profile.objects.create(full_name=full_name)
                     user = User.objects.create_user(username=username, password=password,email=email, phone_number=phone_number, profile=profile)
                     # Login after register
-                    auth.login(request, user)
+                    auth.login(request, user, backend='users.backends.EmailBackend')
                     messages.success(request, 'You are now logged in')
                     return JsonResponse(
                         {"status": 'You are now logged in'},
