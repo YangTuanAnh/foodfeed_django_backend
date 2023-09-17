@@ -80,7 +80,7 @@ def login(request):
         if user is not None:
             #debug here
             print("user is not none")
-
+            print(request)
             auth.login(request, user)
             messages.success(request, 'You are now logged in')
             return JsonResponse(
