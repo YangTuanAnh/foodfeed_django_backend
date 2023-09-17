@@ -100,10 +100,14 @@ def login(request):
     else: return HttpResponse("Login")
     
 @csrf_exempt
-@login_required
 def logout(request):
+    if not request.user.is_authenticated:
+        return JsonResponse(
+            {"status": "Unauthenticated"},
+            status=400
+        )
     if request.method=="POST":
-        auth.logout(request)
+        auth.logout(request.user)
         messages.success(request, "You are now logged out")
         return JsonResponse(
             {"status": "You are now logged out"},
@@ -112,8 +116,12 @@ def logout(request):
     else: return HttpResponse("Logout")
         
 @csrf_exempt
-@login_required
 def profile(request):
+    if not request.user.is_authenticated:
+        return JsonResponse(
+            {"status": "Unauthenticated"},
+            status=400
+        )
     if request.method=="PUT":
         data = json.loads(request.body)
         profile = request.user.profile
@@ -144,8 +152,12 @@ def get_user(request, user_id):
             #messages.error(f"User {user_id} does not exist")
             return JsonResponse({"status": f"User {user_id} does not exist"}, status=404)
 
-@login_required
 def friends(request):
+    if not request.user.is_authenticated:
+        return JsonResponse(
+            {"status": "Unauthenticated"},
+            status=400
+        )
     if request.method=="GET":
         user_friends = Friend.objects.filter(user_from=request.user).values_list('user_to', flat=True)
        
@@ -166,8 +178,12 @@ def friends(request):
         return JsonResponse(user_friends, status=200, safe = False)
 
 @csrf_exempt
-@login_required
 def make_friend(request, user_id):
+    if not request.user.is_authenticated:
+        return JsonResponse(
+            {"status": "Unauthenticated"},
+            status=400
+        )
     if request.method=="GET":
         user = User.objects.get(id=user_id)
         user_friends = Friend.objects.filter(user_from=user).values_list('user_to', flat=True)

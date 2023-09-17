@@ -114,8 +114,12 @@ def posts(request):
         posts_json = serializers.serialize('json', posts)
         return JsonResponse(json.loads(posts_json), safe=False, status=200)
 
-@login_required
 def post(request, post_id):
+    if not request.user.is_authenticated:
+        return JsonResponse(
+            {"status": "Unauthenticated"},
+            status=400
+        )
     if request.method=="GET":
         try:
             post = Post.objects.get(id=post_id)
