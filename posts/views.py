@@ -104,7 +104,7 @@ def posts(request):
         
         image_link = uploadOntoS3(image_base64, image_name)        
         
-        post = Post.objects.create(user=user, body=body, rating=rating, food=food, image_link=image_link, username=username)
+        post = Post.objects.create(user=user, body=body, rating=rating, title=title, food=food, image_link=image_link, username=username)
         
         return JsonResponse({"status": "Created post " + str(post.id)}, status="200")
         
