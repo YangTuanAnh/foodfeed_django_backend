@@ -75,15 +75,13 @@ def login(request):
         email = data.get('email')
         password = data.get('password')
 
-        emailBackend = EmailBackend()
-        
-        user = emailBackend.authenticate(request=request, username=email, password=password)
+        user = auth.authenticate(request=request, username=email, password=password)
 
         if user is not None:
             #debug here
             print("user is not none")
 
-            auth.login(request, user, emailBackend)
+            auth.login(request, user)
             messages.success(request, 'You are now logged in')
             return JsonResponse(
                 {"status": "You are now logged in"},
