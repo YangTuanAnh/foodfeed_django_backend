@@ -41,7 +41,14 @@ def stores(request, store_id):
         try:
             store = Store.objects.get(id = store_id)
 
-            results = {'name': store.name, 'address': store.address, 'latitude': store.latitude, 'longitude': store.longitude}
+            results = {
+                'name': store.name, 
+                'address': store.address, 
+                'latitude': store.latitude, 
+                'longitude': store.longitude, 
+                'avg_rating': store.avg_rating,
+                'image_link': store.image_link
+                }
             return JsonResponse({"status": "success", 'result': results}, status=200)
         except Store.DoesNotExist:
             return JsonResponse({"status": f"Did not found store {store_id}", "result" : None}, status=404)
