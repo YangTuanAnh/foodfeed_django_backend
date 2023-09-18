@@ -209,7 +209,7 @@ def make_friend(request, user_id):
             for friend in friends_to:
                 if Friend.objects.filter(user_from=user1, user_to=friend.user_to).exists(): continue
                 suggestion = Suggestion(user_from=user1, user_to=friend.user_to)
-                suggestion.shared_friends = Friend.objects.filter(user_from=friend.user_to).filter(user_from=user1).count()
+                suggestion.shared_friends = Friend.objects.filter(user_to=friend.user_to).filter(user_from__id=Friend.objects.filter(user_from=request.user)).count()
                 suggestion.save()
             return JsonResponse(f"Added friendship between {user1.id} and {user2.id}", status=200, safe = False)
         
