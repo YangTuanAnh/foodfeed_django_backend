@@ -49,16 +49,14 @@ def register(request):
                     profile = Profile.objects.create(full_name=full_name)
                     user = User.objects.create_user(username=username, password=password,email=email, phone_number=phone_number, profile=profile)
                     # Login after register
-                    auth.login(request, user, 'users.backends.EmailBackend')
-                    # messages.success(request, 'You are now logged in')
-                    
-                    
-                    user.save()
-                    messages.success(request, 'You are now registered and can log in')
+                    auth.login(request, user)
+                    messages.success(request, 'You are now logged in')
                     return JsonResponse(
-                        {"status": 'You are now registered and can log in'},
+                        {"status": 'You are now logged in'},
                         status=200
                     )
+                    # user.save()
+                    # messages.success(request, 'You are now registered and can log in')
                     # return redirect('login')
         else:
             messages.error(request, 'Passwords do not match')
@@ -77,12 +75,14 @@ def login(request):
         email = data.get('email')
         password = data.get('password')
 
-        user = auth.authenticate(request=request, email=email, password=password)
+        emailBackend = EmailBackend()
+        
+        user = emailBackend.authenticate(request=request, username=email, password=password)
 
         if user is not None:
             #debug here
             print("user is not none")
-            
+
             auth.login(request, user)
             messages.success(request, 'You are now logged in')
             return JsonResponse(
@@ -100,12 +100,8 @@ def login(request):
     else: return HttpResponse("Login")
     
 @csrf_exempt
+@login_required
 def logout(request):
-    # if not request.user.is_authenticated:
-    #     return JsonResponse(
-    #         {"status": "Unauthenticated"},
-    #         status=400
-    #     )
     if request.method=="POST":
         auth.logout(request)
         messages.success(request, "You are now logged out")
@@ -116,12 +112,8 @@ def logout(request):
     else: return HttpResponse("Logout")
         
 @csrf_exempt
+@login_required
 def profile(request):
-    if not request.user.is_authenticated:
-        return JsonResponse(
-            {"status": "Unauthenticated"},
-            status=400
-        )
     if request.method=="PUT":
         data = json.loads(request.body)
         profile = request.user.profile
@@ -152,12 +144,8 @@ def get_user(request, user_id):
             #messages.error(f"User {user_id} does not exist")
             return JsonResponse({"status": f"User {user_id} does not exist"}, status=404)
 
+@login_required
 def friends(request):
-    if not request.user.is_authenticated:
-        return JsonResponse(
-            {"status": "Unauthenticated"},
-            status=400
-        )
     if request.method=="GET":
         user_friends = Friend.objects.filter(user_from=request.user).values_list('user_to', flat=True)
        
@@ -178,12 +166,8 @@ def friends(request):
         return JsonResponse(user_friends, status=200, safe = False)
 
 @csrf_exempt
+@login_required
 def make_friend(request, user_id):
-    if not request.user.is_authenticated:
-        return JsonResponse(
-            {"status": "Unauthenticated"},
-            status=400
-        )
     if request.method=="GET":
         user = User.objects.get(id=user_id)
         user_friends = Friend.objects.filter(user_from=user).values_list('user_to', flat=True)
