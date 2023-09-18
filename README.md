@@ -246,13 +246,116 @@ if gave reaction, else if reacted
 ##### GET
 Returns posts about that food item. Refer to `/<int:food_id>` for format.
 ### stores
-
+### `/search-autocomplete`
+Returns searched store
+##### GET
+```
+  query: "buger"
+  limit: "10"
+```
+Returns
+```js
+{
+  status: "success",
+  results: [
+    {
+        "name": "Cơm 42",
+        "address": "42 Cô Bắc, Quận 1, TP. HCM",
+        "latitude": 10.765162,
+        "longitude": 106.69518
+    },
+    {
+        "name": "Cơm 98",
+        "address": "98 Lê Văn Lương, P. Tân Hưng, Quận 7, TP. HCM",
+        "latitude": 10.7511547,
+        "longitude": 106.7050986
+    },
+  ]
+}
+```
+### `/<int:store_id>`
+Returns store details
+##### GET
+Takes in `<int:store_id>`, returns:
+```js
+{
+    "name": "Cơm 42",
+    "address": "42 Cô Bắc, Quận 1, TP. HCM",
+    "latitude": 10.765162,
+    "longitude": 106.69518,
+    "avg_rating": 4,
+    "image_link": "https://images.foody.vn/res/g112/1112437/prof/s640x400/foody-upload-api-foody-mobile-se-5704914d-211022141924.jpeg"
+}
+```
+##### POST
+Takes in `<int:store_id>` and:
+```js
+{
+  name: "Cơm tấm 3 miền",
+  address: "123 Nguyễn Văn Cừ, phường 1, quận 5", 
+  latitude: "80.223", 
+  longitude: "102.1233"
+}
+```
+Returns
+```js
+{
+  status: "Created store + <int:store_id>"
+}
+```
+##### PUT
+Takes in `<int:store_id>` and:
+```js
+{
+  name: "Cơm tấm 3 miền",
+  address: "123 Nguyễn Văn Cừ, phường 1, quận 5", 
+  latitude: "80.223", 
+  longitude: "102.1233"
+}
+```
+Returns
+```js
+{
+  status: "Updated store + <int:store_id>"
+}
+```
+##### DELETE
+Takes in `<int:store_id>`, returns:
+```js
+{
+  status: "Deleted store + <int:store_id>"
+}
+```
 ### feed
 #### `\`
 ##### GET
 Returns the first 50 posts sorted by newest
 ### food
-
+### `/search-autocomplete`
+Returns searched store
+##### GET
+```
+  query: "cơm"
+  limit: "10"
+```
+Returns
+```js
+{
+  "status": "success",
+  "results": [
+    "cơm",
+    "cơm",
+    "cơm bì",
+    "cơm thêm",
+    "cơm bò úc",
+    "cơm cá kho",
+    "cơm bì chả",
+    "cơm sườn bì chả",
+    "cơm bò xào măng",
+    "cơm ba rọi nướng"
+  ]
+}
+```
 ### tags
 #### `\`
 ##### GET

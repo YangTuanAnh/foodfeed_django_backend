@@ -29,7 +29,7 @@ def search_autocomplete(request):
         ]
 
         return JsonResponse(
-            {'status': "success", 'results': json.load(serialized_results), 'count': len(results)},
+            {'status': "success", 'results': serialized_results, 'count': len(results)},
             safe=False, status=200
         )
     else:
@@ -40,8 +40,18 @@ def stores(request, store_id):
     if request.method == "GET":
         try:
             store = Store.objects.get(id = store_id)
-            return JsonResponse({"status": "success", 'result': store}, status=200)
-        except:
+            store_json = {
+                "id": store.id,
+                "name": store.name,
+                "address": store.address,
+                "latitude": store.latitude,
+                "longitude": store.longitude,
+                "avg_rating": store.avg_rating,
+                "image_link": store.image_link,
+            }
+            
+            return JsonResponse({"status": "success", 'result': store_json}, status=200)
+        except Store.DoesNotExist:
             return JsonResponse({"status": f"Did not found store {store_id}", "result" : None}, status=404)
     
     elif request.method == "POST":
