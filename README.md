@@ -1,5 +1,8 @@
 # Foodfeed Backend Server
 Redirect to Mobile repository [here](https://github.com/nguyenhoangminh31082003/CS426-Final_project).
+
+[Project report](https://docs.google.com/document/d/1mTSP7pZCCui372rqDqkFzVS5eotng20O1eRoFE-un94/edit?usp=sharing)
+
 ## Technologies
 Storage: PostgreSQL (Database) + S3 Bucket (File blobs) + Redis (In-memory caching)
 

@@ -97,6 +97,11 @@ def posts(request):
         image_name = data.get("image_name")
         
         food_id = data.get("food_id")
+        try:
+            threshold = 0.2
+            food_sim = Food.objects.similar_to(title, threshold).first()
+            food_id = food_sim.id
+        except: pass
         
         food = Food.objects.get(id=food_id)
         
