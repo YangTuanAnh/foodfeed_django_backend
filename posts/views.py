@@ -131,7 +131,7 @@ def post(request, post_id):
                 "image_link": post.image_link,
                 "username": post.user.username,
                 "full_name": post.user.profile.full_name,
-                "create_at": post.create_at,
+                "create_at": str(post.create_at),
             }
             return JsonResponse(post_json, safe=False, status=200)
         except Post.DoesNotExist:
@@ -185,7 +185,7 @@ def food_reviews(request, food_id):
                 "image_link": post.image_link,
                 "username": post.user.username,
                 "full_name": post.user.profile.full_name,
-                "create_at": post.create_at,
+                "create_at": str(post.create_at),
             }
             for post in posts
         ]

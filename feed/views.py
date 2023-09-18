@@ -17,7 +17,7 @@ def timeline(request):
                 "image_link": post.image_link,
                 "username": post.user.username,
                 "full_name": post.user.profile.full_name,
-                "create_at": post.create_at,
+                "create_at": str(post.create_at),
             } for post in posts
         ]
         return JsonResponse(posts_json, status=200, safe=False)
