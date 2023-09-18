@@ -2,7 +2,7 @@
 ## Technologies
 Storage: PostgreSQL (Database) + S3 Bucket (File blobs) + Redis (In-memory caching)
 
-Data Retrieval: BeautifulSoup + Selenium, crawled **29558** shops and **712,733** food items around **Ho Chi Minh City**
+Data Retrieval: BeautifulSoup + Selenium, crawled **29,558** shops and **712,733** food items around **Ho Chi Minh City**
 
 API Deployment: Django
 
@@ -41,28 +41,38 @@ conda install -r requirements.txt
 - if the installation fails, run the below code to check missing modules.
 
   ```
-  python manage.py runserver
+    python manage.py runserver
   ```
 
   Some modules may occur for installation.
 
   ```
-  pip install python-dotenv supabase psycopg2-binary django-cors-headers geopy redis
+    pip install python-dotenv supabase psycopg2-binary django-cors-headers geopy redis
   ```
 
 3. Run the application (make sure you have PostgreSQL running on your machine and please change the database settings in settings.py to your own database settings...)
 
-    ```
-    python manage.py makemigrations
-    python manage.py migrate 
-    python manage.py runserver
-    ```
-4. *(Optional - Should use when running on a server)* Deploy Backend on **ngrok**
+```
+  python manage.py makemigrations
+  python manage.py migrate 
+  python manage.py runserver
+```
+
+4. Build the Docker image and run the container using the following commands:
+
+```
+  docker build -t foodfeed_django_backend .
+  docker run -d -p 8000:8000 foodfeed_django_backend
+```
+
+  TODO: Use Docker-compose to automate deployment
+
+5. *(Optional - Should use when running on a server)* Deploy Backend on **ngrok**
 
 - Open a new terminal and run **ngrok**:
-    ```
+  ```
     ngrok http 8000
-    ```
+  ```
 
 - If not using **ngrok**, just use the localhost [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
@@ -76,7 +86,7 @@ Login to existing user in the database.
 ```js
 {
   email: "yangtuananh2003@gmail.com",
-  password: 123456
+  password: "123456"
 }
 ```
 returns
@@ -94,9 +104,9 @@ Create new user in case they haven't existed in the database.
   full_name: "Yang Tuan Anh", 
   username: "yangtuananh", 
   email: "yangtuananh2003@gmail.com", 
-  phone_number: 91311699, 
-  password: 123456, 
-  password2: 123456
+  phone_number: "91311699", 
+  password: "123456", 
+  password2: "123456"
 }
 ```
 if valid input and user hasnt existed, returns
@@ -154,10 +164,27 @@ Returns the profile of a specified user id.
 ##### GET
 Returns a list of user objects which are friends to the authenticated user.
 #### `/friends/<int:user_id>`
+
+##### GET
 Returns a list of user objects which are friends to the user with given id.
 
+##### POST
+If not friended, then adds them onto the current users' friendlist, as well as using bipartite graph matching to add people with most common friends into a recommendation list. Returns:
+```js
+{
+  "status": "Added friendship of User 12 with User 22"
+}
+```
+
+Else, remove them from friendlist and recommended users who are friends of that person. Returns:
+```js
+{
+  "status": "Removed friendship of User 12 with User 22"
+}
+```
+
 #### `/friends/suggestions`
-Returns 5 random users (TODO: Use BFS to find closely unfriended users)
+Returns 5 users sorted by most common friends, or select randomly if there isnt enough users to suggest by commonality.
 
 ### /posts
 #### GET
