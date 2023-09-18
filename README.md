@@ -1,4 +1,5 @@
 # Foodfeed Backend Server
+Redirect to Mobile repository [here](https://github.com/nguyenhoangminh31082003/CS426-Final_project).
 ## Technologies
 Storage: PostgreSQL (Database) + S3 Bucket (File blobs) + Redis (In-memory caching)
 
@@ -6,7 +7,9 @@ Data Retrieval: BeautifulSoup + Selenium, crawled **29,558** shops and **712,733
 
 API Deployment: Django
 
-Server Deployment: Docker, AWS EC2 - Ubuntu Instance
+Server Deployment: Docker, AWS EC2 - Ubuntu Instance, NGiNX
+
+![Architecture](architecture.png)
 
 ## Instruction
 
