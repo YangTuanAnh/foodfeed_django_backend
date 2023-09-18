@@ -139,19 +139,20 @@ def search(request):
                                 "food": {
                                     "id": food.id,
                                     "name": food.name,
-                                    "store": str(food.store),
+                                    "store": food.store.id,
                                     "price": food.price,
                                     "image_link": food.image_link
                                 },
                                 "review": {
                                     "id": review.id,
                                     "user": review.user.id,
-                                    "username": review.username,
                                     "title": review.title,
                                     "body": review.body,
                                     "food": review.food.id,
                                     "rating": review.rating,
                                     "image_link": review.image_link,
+                                    "username": review.user.username,
+                                    "full_name": review.user.profile.full_name,
                                     "create_at": review.create_at
                                 }
                             })
@@ -160,7 +161,7 @@ def search(request):
                                 "food": {
                                     "id": food.id,
                                     "name": food.name,
-                                    "store": str(food.store),
+                                    "store": food.store.id,
                                     "price": food.price,
                                     "image_link": food.image_link
                                 },

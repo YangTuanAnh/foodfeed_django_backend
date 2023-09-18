@@ -13,6 +13,7 @@ def timeline(request):
                 "user": post.user.id,
                 "title": post.title,
                 "body": post.body,
+                "food": post.food.id,
                 "rating": post.rating,
                 "image_link": post.image_link,
                 "username": post.user.username,
