@@ -20,4 +20,4 @@ def timeline(request):
                 "create_at": post.create_at,
             } for post in posts
         ]
-        return JsonResponse(json.loads(posts_json), status=200, safe=False)
+        return JsonResponse(posts_json, status=200, safe=False)
