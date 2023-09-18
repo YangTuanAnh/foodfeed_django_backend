@@ -98,13 +98,11 @@ def posts(request):
         
         food_id = data.get("food_id")
         
-        username = request.user.username
-        
         food = Food.objects.get(id=food_id)
         
         image_link = uploadOntoS3(image_base64, image_name)        
         
-        post = Post.objects.create(user=user, body=body, rating=rating, food=food, image_link=image_link, username=username)
+        post = Post.objects.create(user=user, body=body, rating=rating, food=food, image_link=image_link)
         
         return JsonResponse({"status": "Created post " + str(post.id)}, status="200")
         
@@ -124,8 +122,18 @@ def post(request, post_id):
         try:
             post = Post.objects.get(id=post_id)
             messages.success(request, f"Found post {post_id}")
-            post_json = serializers.serialize('json', [post])
-            return JsonResponse(json.loads(post_json)[0], safe=False, status=200)
+            post_json = {
+                "id": post.id,
+                "user": post.user.id,
+                "title": post.title,
+                "body": post.body,
+                "rating": post.rating,
+                "image_link": post.image_link,
+                "username": post.user.username,
+                "full_name": post.user.profile.full_name,
+                "create_at": post.create_at,
+            }
+            return JsonResponse(post_json, safe=False, status=200)
         except Post.DoesNotExist:
             messages.error(request, f"Did not found post {post_id}")
             return JsonResponse({"status": f"Did not found post {post_id}"}, status=404)
@@ -175,8 +183,9 @@ def food_reviews(request, food_id):
                 "body": post.body,
                 "rating": post.rating,
                 "image_link": post.image_link,
-                "username": post.username,
-                "created_at": post.created_at,
+                "username": post.user.username,
+                "full_name": post.user.profile.full_name,
+                "create_at": post.create_at,
             }
             for post in posts
         ]
