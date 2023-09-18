@@ -6,6 +6,6 @@ import  json
 
 def timeline(request):
     if request.method=="GET":
-        posts = Post.objects.order_by('create_at')[:50]
+        posts = Post.objects.order_by('-create_at')[:50]
         posts_json = serializers.serialize('json', posts)
         return JsonResponse(json.loads(posts_json), status=200, safe=False)

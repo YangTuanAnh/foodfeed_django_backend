@@ -33,8 +33,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*", "13.229.250.243"]
 
+SESSION_COOKIE_DOMAIN = None
+
+SESSION_COOKIE_SECURE = False
+
 # for instant deploying the website using ngrok platform
-CSRF_TRUSTED_ORIGINS = ["https://*.ngrok-free.app", "http://127.0.0.1", "http://0.0.0.0"]
+CSRF_TRUSTED_ORIGINS = ["https://*.ngrok-free.app", "http://127.0.0.1", "http://0.0.0.0", "http://13.229.250.243"]
 
 DJANGO_ALLOWED_HOSTS='localhost 127.0.0.1 [::1] 0.0.0.0'
 # Application definition
@@ -144,7 +148,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
-AUTHENTICATION_BACKENDS = ['users.backends.EmailBackend']
+AUTHENTICATION_BACKENDS = ['users.backends.EmailBackend', 'django.contrib.auth.backends.ModelBackend']
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
