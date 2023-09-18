@@ -5,7 +5,7 @@ from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages, auth
 from .models import CustomUser as User
-from .models import Profile, Friend
+from .models import Profile, Friend, Suggestion
 from .backends import EmailBackend
 from django.db.models import Q
 import json
@@ -196,27 +196,43 @@ def make_friend(request, user_id):
         user2 = User.objects.get(id=user_id)
         
         try:
-            exists = Friend.objects.get(user_from=user1, user_to=user2)
-            exists.delete()
+            Friend.objects.get(user_from=user1, user_to=user2).delete()
+            friends = Friend.objects.filter(user_from=user2).values_list("user_to", flat=True)
+            Suggestion.objects.filter(user_from=user1, user_to__in=friends).delete()
             print("This is THE POST " + f"Removed friendship between {user1.id} and {user2.id}")
             return JsonResponse(f"Removed friendship between {user1.id} and {user2.id}", status=200, safe = False)
         except Friend.DoesNotExist:
             friendship = Friend(user_from=user1, user_to=user2)
             friendship.save()
+            Suggestion.objects.filter(user_from=user1, user_to=user2).delete()
+            friends_to = Friend.objects.filter(user_from=user2)
+            for friend in friends_to:
+                if Friend.objects.filter(user_from=user1, user_to=friend.user_to).exists(): continue
+                suggestion = Suggestion(user_from=user1, user_to=friend.user_to)
+                suggestion.shared_friends = Friend.objects.filter(user_from=friend.user_to).filter(user_from=user1).count()
+                suggestion.save()
             return JsonResponse(f"Added friendship between {user1.id} and {user2.id}", status=200, safe = False)
         
 def suggestions(request):
     if request.method=="GET":
-        suggest_users = User.objects.exclude(id=request.user.id)
+        # suggest_users = User.objects.exclude(id=request.user.id)
 
-        friends = Friend.objects.filter(user_from=request.user).values_list("user_to")
+        # friends = Friend.objects.filter(user_from=request.user).values_list("user_to")
+        suggest_users = Suggestion.objects.filter(user_from=request.user).order_by("-shared_friends").values_list('user_to', flat=True)[:5]
 
-        for user in list(friends):
-            suggest_users = suggest_users.exclude(id = user[0])
-            print(":", user[0])
+        suggested = list(User.objects.filter(id__in=suggest_users))
+        suggested_count = len(suggest_users)
+        
+        if suggested_count<5:
+            remaining_users = list(User.objects.exclude(id=request.user.id).exclude(id__in=suggest_users).order_by('?')[:5-suggested_count])
+            suggested.extend(remaining_users)
+            
+        # for user in list(friends):
+        #     suggest_users = suggest_users.exclude(id = user[0])
+        #     print(":", user[0])
 
         #suggest_users = suggest_users.exclude(user_to__in=list(friends))
-        suggest_users = suggest_users.order_by('?')[:5]
+        # suggest_users = suggest_users.order_by('?')[:5]
 
-        users_json = serializers.serialize('json', suggest_users)
+        users_json = serializers.serialize('json', suggested)
         return JsonResponse(json.loads(users_json), status=200, safe = False)

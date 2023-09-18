@@ -28,3 +28,12 @@ class Friend(models.Model):
         
     def __str__(self):
         return f"{self.user1} and {self.user2}"
+    
+class Suggestion(models.Model):
+    user_from = models.ForeignKey(CustomUser, to_field="id", on_delete=models.CASCADE, related_name="user_from_suggestion")
+    user_to = models.ForeignKey(CustomUser, to_field="id", on_delete=models.CASCADE, related_name="user_to_suggestion")
+    shared_friends = models.IntegerField(default=0)
+    
+    class Meta:
+        unique_together = ('user_from', 'user_to')
+    
