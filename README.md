@@ -360,7 +360,7 @@ Takes in `<int:store_id>`, returns:
 }
 ```
 ### feed
-#### `\`
+#### `/`
 ##### GET
 Returns the first 50 posts sorted by newest
 ### food
@@ -390,7 +390,7 @@ Returns
 }
 ```
 ### tags
-#### `\`
+#### `/`
 ##### GET
 Takes in `query`, returns:
 ```js
